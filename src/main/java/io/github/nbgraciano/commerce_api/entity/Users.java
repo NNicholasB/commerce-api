@@ -26,6 +26,6 @@ public class Users {
 
     private  String password;
 
-    private   String role;
+    private   Role role;
 
 }
