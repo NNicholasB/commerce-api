@@ -1,17 +1,20 @@
 package io.github.nbgraciano.commerce_api.entity.dto.Order;
 
-import io.github.nbgraciano.commerce_api.entity.Status;
-import io.github.nbgraciano.commerce_api.entity.Users;
+import io.github.nbgraciano.commerce_api.entity.dto.OrderItem.OrderItemRequestDTO;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
 public record OrderRequestDTO(
-        @NotBlank(message = "User obligatory")
-        Users usersId,
-        List items
 
-) {
-}
+        @NotNull(message = "User is required")
+        UUID userId,
+
+        @NotEmpty(message = "Order must contain at least one item")
+        List<@Valid OrderItemRequestDTO> items
+
+) {}
