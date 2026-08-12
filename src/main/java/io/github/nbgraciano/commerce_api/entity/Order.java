@@ -28,6 +28,12 @@ public class Order {
 
     private BigDecimal total;
 
-   private List items;
+    @OneToMany(
+            mappedBy = "order",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private List<OrderItem> items;
+
 
 }
