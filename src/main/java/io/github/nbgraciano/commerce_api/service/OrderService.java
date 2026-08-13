@@ -185,4 +185,15 @@ public class OrderService {
         order.setStatus(Status.DELIVERED);
         return mapper.toResponse(repository.save(order));
     }
+
+    public void recalculateTotal(Order order){
+    BigDecimal total=order.getItems().stream().map(OrderItem::getSubtotal).reduce(BigDecimal.ZERO,BigDecimal::add);
+
+    order.setTotal(total);
+    repository.save(order);
+    }
+
+    public Order findEntityById(UUID orderId) {
+        return repository.findById(orderId).orElseThrow(()->new EntityNotFoundException("Order not found"));
+    }
 }
