@@ -9,7 +9,6 @@ import io.github.nbgraciano.commerce_api.entity.dto.OrderItem.OrderItemResponseD
 import io.github.nbgraciano.commerce_api.entity.mappers.OrderItemMapper;
 import io.github.nbgraciano.commerce_api.exception.EntityNotFoundException;
 import io.github.nbgraciano.commerce_api.repository.OrderItemRepository;
-import io.github.nbgraciano.commerce_api.repository.OrderRepository;
 import io.github.nbgraciano.commerce_api.repository.ProductRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
