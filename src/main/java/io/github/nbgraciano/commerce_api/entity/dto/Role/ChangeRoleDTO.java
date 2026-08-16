@@ -1,9 +1,9 @@
-package io.github.nbgraciano.commerce_api.entity.dto.role;
+package io.github.nbgraciano.commerce_api.entity.dto.Role;
 
 import io.github.nbgraciano.commerce_api.entity.Role;
 import jakarta.validation.constraints.NotNull;
 
-public record ChargeRoleDTO(
+public record ChangeRoleDTO(
         @NotNull
         Role role
 ) {
