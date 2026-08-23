@@ -13,6 +13,7 @@ import io.github.nbgraciano.commerce_api.exception.EntityNotFoundException;
 import io.github.nbgraciano.commerce_api.exception.InvalidPasswordException;
 import io.github.nbgraciano.commerce_api.repository.UsersRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -46,7 +47,14 @@ public class UsersService {
         return mapper.toResponse(user);
         }
 
-    public List<UsersResponseDTO> findAll(){
+    public List<UsersResponseDTO> findAll(String name,String email)
+    {
+        if (name!=null){
+            return mapper.toResponse(repository.findByNameContainingIgnoreCase(name));
+        }
+        if(email != null){
+            return mapper.toResponse(repository.findByEmailContainingIgnoreCase(email));
+        }
         return mapper.toResponse(repository.findAll());
     }
 
@@ -68,6 +76,7 @@ public class UsersService {
         return mapper.toResponse(repository.save(user));
     }
 
+
     public void changePassword(UUID id, PasswordChangeDTO request){
         Users user=repository.findById(id).orElseThrow(()-> new EntityNotFoundException("User not found"));
         if (!passwordEncoder.matches(request.currentPassword(), user.getPassword())) {
@@ -77,6 +86,7 @@ public class UsersService {
         user.setPassword(passwordEncoder.encode(request.newPassword()));
         repository.save(user);
     };
+
 
     public UsersResponseDTO changeRole(UUID id, ChangeRoleDTO request){
         Users user=repository.findById(id).orElseThrow(()-> new EntityNotFoundException("User not found"));
