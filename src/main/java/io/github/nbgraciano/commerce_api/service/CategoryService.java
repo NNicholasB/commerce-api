@@ -42,8 +42,10 @@ public class CategoryService {
         return mapper.toResponse(categoryAchada);
     }
 
-    public List<CategoryResponseDTO> findAll(){
-
+    public List<CategoryResponseDTO> findAll(String name){
+        if (name != null){
+            return mapper.toResponse(repository.findByNameContainingIgnoreCase(name));
+        }
         return mapper.toResponse(repository.findAll());
     }
 
