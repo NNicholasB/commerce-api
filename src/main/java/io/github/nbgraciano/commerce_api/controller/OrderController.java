@@ -4,6 +4,7 @@ package io.github.nbgraciano.commerce_api.controller;
 import io.github.nbgraciano.commerce_api.entity.dto.Order.OrderRequestDTO;
 import io.github.nbgraciano.commerce_api.entity.dto.Order.OrderResponseDTO;
 import io.github.nbgraciano.commerce_api.service.OrderService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -31,7 +32,7 @@ public class OrderController {
     }
 
     @PostMapping()
-    public ResponseEntity<OrderResponseDTO> create(@RequestBody OrderRequestDTO request){
+    public ResponseEntity<OrderResponseDTO> create(@Valid @RequestBody OrderRequestDTO request){
         OrderResponseDTO created = service.create(request);
         URI uri= ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
@@ -41,7 +42,7 @@ public class OrderController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<OrderResponseDTO> update(@PathVariable UUID id,@RequestBody OrderRequestDTO request){
+    public ResponseEntity<OrderResponseDTO> update(@PathVariable UUID id,@Valid @RequestBody OrderRequestDTO request){
         return ResponseEntity.ok().body(service.update(id,request));
     }
 
