@@ -6,6 +6,7 @@ import io.github.nbgraciano.commerce_api.entity.dto.Category.CategoryResponseDTO
 import io.github.nbgraciano.commerce_api.entity.dto.Users.UsersResponseDTO;
 import io.github.nbgraciano.commerce_api.service.CategoryService;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -43,14 +44,14 @@ public class CategoryController {
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable UUID id){
+    public ResponseEntity<Void> delete(@PathVariable UUID id){
         service.deleteById(id);
+        return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<CategoryResponseDTO> update(@PathVariable UUID id,@RequestBody CategoryRequestDTO request){
         CategoryResponseDTO update = service.update(id, request);
-
         return ResponseEntity.ok().body(update);
     }
 }
