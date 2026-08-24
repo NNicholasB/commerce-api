@@ -3,13 +3,13 @@ package io.github.nbgraciano.commerce_api.controller;
 
 import io.github.nbgraciano.commerce_api.entity.dto.Category.CategoryRequestDTO;
 import io.github.nbgraciano.commerce_api.entity.dto.Category.CategoryResponseDTO;
-import io.github.nbgraciano.commerce_api.entity.dto.Users.UsersResponseDTO;
+
 import io.github.nbgraciano.commerce_api.service.CategoryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.Response;
+
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
+
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
