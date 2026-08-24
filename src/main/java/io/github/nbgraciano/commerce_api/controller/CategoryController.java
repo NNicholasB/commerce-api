@@ -5,6 +5,7 @@ import io.github.nbgraciano.commerce_api.entity.dto.Category.CategoryRequestDTO;
 import io.github.nbgraciano.commerce_api.entity.dto.Category.CategoryResponseDTO;
 import io.github.nbgraciano.commerce_api.entity.dto.Users.UsersResponseDTO;
 import io.github.nbgraciano.commerce_api.service.CategoryService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.Response;
 import org.springframework.http.ResponseEntity;
@@ -36,7 +37,7 @@ public class CategoryController {
     }
 
     @PostMapping()
-    public ResponseEntity<CategoryResponseDTO> create(@RequestBody CategoryRequestDTO request){
+    public ResponseEntity<CategoryResponseDTO> create(@Valid @RequestBody CategoryRequestDTO request){
         CategoryResponseDTO response=service.create(request);
         URI uri= ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
                 .buildAndExpand(response.id()).toUri();
@@ -50,7 +51,7 @@ public class CategoryController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CategoryResponseDTO> update(@PathVariable UUID id,@RequestBody CategoryRequestDTO request){
+    public ResponseEntity<CategoryResponseDTO> update(@PathVariable UUID id,@Valid @RequestBody CategoryRequestDTO request){
         CategoryResponseDTO update = service.update(id, request);
         return ResponseEntity.ok().body(update);
     }
