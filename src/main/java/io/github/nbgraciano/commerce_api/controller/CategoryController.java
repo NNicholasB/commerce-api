@@ -25,20 +25,32 @@ public class CategoryController {
     @GetMapping()
     public ResponseEntity<List<CategoryResponseDTO>>  findAll(@RequestParam(required = false)String name){
         List<CategoryResponseDTO> lista=service.findAll(name);
+
         return ResponseEntity.ok().body(lista);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<CategoryResponseDTO> findById(UUID id){
+    public ResponseEntity<CategoryResponseDTO> findById(@PathVariable UUID id){
         return ResponseEntity.ok().body(service.findById(id));
     }
 
     @PostMapping()
-    public ResponseEntity<CategoryResponseDTO> create(CategoryRequestDTO request){
+    public ResponseEntity<CategoryResponseDTO> create(@RequestBody CategoryRequestDTO request){
         CategoryResponseDTO response=service.create(request);
         URI uri= ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
                 .buildAndExpand(response.id()).toUri();
         return ResponseEntity.created(uri).body(response);
     }
 
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable UUID id){
+        service.deleteById(id);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<CategoryResponseDTO> update(@PathVariable UUID id,@RequestBody CategoryRequestDTO request){
+        CategoryResponseDTO update = service.update(id, request);
+
+        return ResponseEntity.ok().body(update);
+    }
 }
