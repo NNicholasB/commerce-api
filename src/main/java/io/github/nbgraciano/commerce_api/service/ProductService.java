@@ -28,7 +28,11 @@ public class ProductService {
             throw new DuplicateEntityException("Product already exists");
         }
 
+        Category category=categoryRepository.findById(request.categoryId()).orElseThrow(()->
+                new EntityNotFoundException("Category not found"));
        Product product=mapper.toEntity(request);
+       product.setCategory(category);
+
         return mapper.toResponse(repository.save(product));
 
     }
@@ -38,7 +42,14 @@ public class ProductService {
                 new EntityNotFoundException("Product not found")));
     }
 
-    public List<ProductResponseDTO> findAll(){
+    public List<ProductResponseDTO> findAll(String name,String category){
+        if (name != null){
+            return mapper.toResponse(repository.findByNameContainingIgnoreCase(name));
+        }
+
+        if (category != null){
+            return mapper.toResponse(repository.findByCategory_NameContainingIgnoreCase(category));
+        }
         return mapper.toResponse(repository.findAll());
     }
 
