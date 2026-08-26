@@ -52,4 +52,25 @@ public class OrderController {
         return ResponseEntity.noContent().build();
     }
 
+    @PatchMapping("/{id}/pay")
+    public ResponseEntity<OrderResponseDTO>pay(@PathVariable UUID id){
+        return ResponseEntity.ok().body(service.pay(id));
+    }
+
+    @PatchMapping("/{id}/cancel")
+    public ResponseEntity<OrderResponseDTO>cancel(@PathVariable UUID id){
+        return ResponseEntity.ok().body(service.cancel(id));
+    }
+
+    @PatchMapping("/{id}/ship")
+    public ResponseEntity<OrderResponseDTO>ship(@PathVariable UUID id){
+        return ResponseEntity.ok().body(service.ship(id));
+    }
+
+    @PatchMapping("/{id}/deliver")
+    public ResponseEntity<OrderResponseDTO>deliver(@PathVariable UUID id){
+        return ResponseEntity.ok().body(service.deliver(id));
+    }
+
+
 }
