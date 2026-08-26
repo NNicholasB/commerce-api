@@ -6,6 +6,7 @@ import io.github.nbgraciano.commerce_api.entity.dto.Order.OrderRequestDTO;
 import io.github.nbgraciano.commerce_api.entity.dto.Order.OrderResponseDTO;
 import io.github.nbgraciano.commerce_api.entity.dto.OrderItem.OrderItemRequestDTO;
 import io.github.nbgraciano.commerce_api.entity.mappers.OrderMapper;
+import io.github.nbgraciano.commerce_api.exception.BusinessException;
 import io.github.nbgraciano.commerce_api.exception.EntityNotFoundException;
 import io.github.nbgraciano.commerce_api.repository.OrderRepository;
 import io.github.nbgraciano.commerce_api.repository.ProductRepository;
@@ -141,7 +142,7 @@ public class OrderService {
         Order order=repository.findById(id).orElseThrow(()->
                 new EntityNotFoundException("Order not found"));
         if (order.getStatus() != Status.WAITING_PAYMENT){
-            throw new IllegalStateException("Order is not waiting for payment");
+            throw new BusinessException("Order is not waiting for payment");
         }
         order.setStatus(Status.PAID);
         return mapper.toResponse(repository.save(order));
@@ -152,7 +153,7 @@ public class OrderService {
                 new EntityNotFoundException("Order not found"));
 
         if (order.getStatus() != Status.WAITING_PAYMENT) {
-            throw new IllegalStateException(
+            throw new BusinessException(
                     "Only orders waiting for payment can be canceled"
             );
         }
@@ -165,7 +166,7 @@ public class OrderService {
                 new EntityNotFoundException("Order not found"));
 
         if (order.getStatus() != Status.PAID) {
-            throw new IllegalStateException(
+            throw new BusinessException(
                     "Only paid orders can be shipped"
             );
         }
@@ -178,7 +179,7 @@ public class OrderService {
                 new EntityNotFoundException("Order not found"));
 
         if (order.getStatus() != Status.SHIPPED) {
-            throw new IllegalStateException(
+            throw new BusinessException(
                     "Only shipped orders can be delivered"
             );
         }
