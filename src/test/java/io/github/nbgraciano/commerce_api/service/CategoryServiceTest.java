@@ -15,12 +15,12 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -137,15 +137,69 @@ public class CategoryServiceTest {
 
     @Test
     void buscarTodasCategorias() {
-        Category category=new Category();
-        category.setName("Eletronicos");
-        when(repository.findAll()).thenReturn(List.of(category));
 
-        List<CategoryResponseDTO> responseDTO=service.findAll(null);
+        Category category = new Category();
+        category.setName("Eletronicos");
+
+        CategoryResponseDTO response =
+                new CategoryResponseDTO(UUID.randomUUID(), "Eletronicos");
+
+        List<Category> categories = List.of(category);
+        List<CategoryResponseDTO> responses = List.of(response);
+
+        when(repository.findAll()).thenReturn(categories);
+
+        when(mapper.toResponse(categories))
+                .thenReturn(responses);
+
+        List<CategoryResponseDTO> responseDTO = service.findAll(null);
+
+        assertEquals(1, responseDTO.size());
+        assertEquals("Eletronicos", responseDTO.get(0).name());
 
         verify(repository).findAll();
+        verify(mapper).toResponse(categories);
     }
 
+    @Test
+    void buscarTodasCategoriasPorNome(){
+        Category category=new Category();
+        category.setName("Eletronicos");
+
+        List<Category> categories= List.of(category);
+
+        CategoryResponseDTO responseDTO= new CategoryResponseDTO(UUID.randomUUID(),"Eletronicos");
+
+        List<CategoryResponseDTO> responses=List.of(responseDTO);
+
+        when(repository.findByNameContainingIgnoreCase("Elet")).thenReturn(categories);
+
+        when(mapper.toResponse(categories)).thenReturn(responses);
+
+        List<CategoryResponseDTO> result=service.findAll("Elet");
+
+        assertEquals(1,result.size());
+        assertEquals("Eletronicos",result.get(0).name());
+
+        verify(repository).findByNameContainingIgnoreCase("Elet");
+        verify(mapper).toResponse(categories);
+    }
+
+    @Test
+    void buscarTodasCategoriasNomeVazio(){
+        Category category=new Category();
+        category.setName("Eletronicos");
+
+        when(repository.findByNameContainingIgnoreCase("zzz")).thenReturn(List.of());
+
+        when(mapper.toResponse(List.of())).thenReturn(List.of());
+
+        List<CategoryResponseDTO> result=service.findAll("zzz");
+
+        assertTrue(result.isEmpty());
+        verify(repository).findByNameContainingIgnoreCase("zzz");
+        verify(mapper).toResponse(List.of());
+    }
     @Test
     void deletarCategoriaPorId(){
 
@@ -208,4 +262,53 @@ public class CategoryServiceTest {
         verify(repository).save(category);
         verify(mapper).toResponse(category);
     }
+
+    @Test
+    void erroUpdateCategoriaExistente() {
+
+        UUID id = UUID.randomUUID();
+
+        Category category = new Category();
+        category.setId(id);
+        category.setName("Eletronicos");
+
+        CategoryRequestDTO requestDTO =
+                new CategoryRequestDTO("Eletronicos");
+
+        when(repository.findById(id))
+                .thenReturn(Optional.of(category));
+
+        when(repository.existsByNameAndIdNot(
+                category.getName(), id))
+                .thenReturn(true);
+
+        assertThrows(
+                DuplicateEntityException.class,
+                () -> service.update(id, requestDTO)
+        );
+
+        verify(repository).findById(id);
+
+        verify(repository).existsByNameAndIdNot(
+                category.getName(), id);
+
+        verify(repository, never())
+                .save(any(Category.class));
+
+        verify(mapper, never())
+                .toResponse(any(Category.class));
+    }
+
+    @Test
+    void erroUpdateCategoriaNaoExistente() {
+    UUID id=UUID.randomUUID();
+    CategoryRequestDTO requestDTO= new CategoryRequestDTO("Eletronicos");
+
+    when(repository.findById(id)).thenReturn(Optional.empty());
+    assertThrows(EntityNotFoundException.class,()->service.update(id,requestDTO));
+
+    verify(repository).findById(id);
+    verify(repository,never()).save(any(Category.class));
+    verify(mapper,never()).toResponse(any(Category.class));
+}
 }
