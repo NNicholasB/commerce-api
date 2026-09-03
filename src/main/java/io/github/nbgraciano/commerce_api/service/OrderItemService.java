@@ -40,6 +40,8 @@ public class OrderItemService {
         orderItem.setQuantity(request.quantity());
         orderItem.setUnitPrice(product.getPrice());
         orderItem.setOrder(order);
+
+
         BigDecimal subtotal = product.getPrice()
                 .multiply(BigDecimal.valueOf(request.quantity()));
         orderItem.setSubtotal(subtotal);
