@@ -87,7 +87,6 @@ public class OrderItemService {
                 );
 
         BigDecimal unitPrice = product.getPrice();
-
         BigDecimal subtotal = unitPrice
                 .multiply(BigDecimal.valueOf(request.quantity()));
 
