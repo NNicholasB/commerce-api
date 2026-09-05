@@ -15,6 +15,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -167,6 +168,172 @@ public class OrderItemServiceTest {
         verify(orderService).findEntityById(orderId);
         verify(repository,never()).save(any(OrderItem.class));
         verify(mapper,never()).toResponse(any(OrderItem.class));
+
+
+    }
+
+    @Test
+    void buscarPorId(){
+
+        UUID productId= UUID.randomUUID();
+        UUID orderId= UUID.randomUUID();
+        UUID userId= UUID.randomUUID();
+        UUID orderItemId= UUID.randomUUID();
+        Product product= new Product(productId,"Mouse","mouse para pc",new BigDecimal(125),12,new Category(UUID.randomUUID(),"Eletronicos"));
+        Order order=new Order(orderId,new Users(userId,
+                "Nicholas","nic@gmail.com","123",Role.USER), Status.WAITING_PAYMENT,new BigDecimal(125)
+                ,new ArrayList<>());
+        OrderItemRequestDTO requestDTO= new OrderItemRequestDTO(productId,1);
+
+        OrderItem orderItem=new OrderItem(orderItemId,order,product,1,new BigDecimal(125),new BigDecimal(125));
+        OrderItemResponseDTO responseDTO= new OrderItemResponseDTO(orderItemId,productId,product.getName(),order.getTotal(),orderItem.getQuantity(),orderItem.getSubtotal());
+        when(repository.findById(orderItemId)).thenReturn(Optional.of(orderItem));
+        when(mapper.toResponse(orderItem)).thenReturn(responseDTO);
+
+        OrderItemResponseDTO result=service.findById(orderItemId);
+        assertEquals("Mouse",result.productName());
+
+        verify(repository).findById(orderItemId);
+        verify(mapper).toResponse(orderItem);
+
+    }
+
+    @Test
+    void erroBuscarPorIdOrderItemNaoEncontrada(){
+
+        UUID productId= UUID.randomUUID();
+        UUID orderId= UUID.randomUUID();
+        UUID userId= UUID.randomUUID();
+        UUID orderItemId= UUID.randomUUID();
+        Product product= new Product(productId,"Mouse","mouse para pc",new BigDecimal(125),12,new Category(UUID.randomUUID(),"Eletronicos"));
+        Order order=new Order(orderId,new Users(userId,
+                "Nicholas","nic@gmail.com","123",Role.USER), Status.WAITING_PAYMENT,new BigDecimal(125)
+                ,new ArrayList<>());
+        OrderItemRequestDTO requestDTO= new OrderItemRequestDTO(productId,1);
+
+        OrderItem orderItem=new OrderItem(orderItemId,order,product,1,new BigDecimal(125),new BigDecimal(125));
+        when(repository.findById(orderItemId)).thenThrow(new EntityNotFoundException("OrderItem not found"));
+        assertThrows(EntityNotFoundException.class,()->service.findById(orderItemId));
+
+        verify(repository).findById(orderItemId);
+        verify(mapper,never()).toResponse(orderItem);
+
+    }
+
+    @Test
+    void buscarTodos(){
+        UUID productId= UUID.randomUUID();
+        UUID orderId= UUID.randomUUID();
+        UUID userId= UUID.randomUUID();
+        UUID orderItemId= UUID.randomUUID();
+        Product product= new Product(productId,"Mouse","mouse para pc",new BigDecimal(125),12,new Category(UUID.randomUUID(),"Eletronicos"));
+        Order order=new Order(orderId,new Users(userId,
+                "Nicholas","nic@gmail.com","123",Role.USER), Status.WAITING_PAYMENT,new BigDecimal(125)
+                ,new ArrayList<>());
+        OrderItem orderItem=new OrderItem(orderItemId,order,product,1,new BigDecimal(125),new BigDecimal(125));
+
+
+       OrderItemResponseDTO responseDTO= new OrderItemResponseDTO(orderItemId,productId,product.getName(),order.getTotal(),orderItem.getQuantity(),orderItem.getSubtotal());
+
+        List<OrderItem> orderItems = List.of(orderItem);
+        List<OrderItemResponseDTO> responses = List.of(responseDTO);
+        when(repository.findAll()).thenReturn(orderItems);
+        when(mapper.toResponse(orderItems)).thenReturn(responses);
+
+        List<OrderItemResponseDTO> result=service.findAll();
+
+
+        assertEquals(1, result.size());
+        assertEquals("Mouse", result.get(0).productName());
+
+
+        verify(repository).findAll();
+        verify(mapper).toResponse(orderItems);
+
+    }
+
+    @Test
+    void deletarPorId(){
+
+        UUID productId= UUID.randomUUID();
+        UUID orderId= UUID.randomUUID();
+        UUID userId= UUID.randomUUID();
+        UUID orderItemId= UUID.randomUUID();
+
+        Product product= new Product(productId,"Mouse","mouse para pc",new BigDecimal(125),12,new Category(UUID.randomUUID(),"Eletronicos"));
+        Order order=new Order(orderId,new Users(userId,
+                "Nicholas","nic@gmail.com","123",Role.USER), Status.WAITING_PAYMENT,new BigDecimal(125)
+                ,new ArrayList<>());
+        OrderItem orderItem=new OrderItem(orderItemId,order,product,1,new BigDecimal(125),new BigDecimal(125));
+
+        when(repository.findById(orderItemId)).thenReturn(Optional.of(orderItem));
+        service.deleteById(orderItemId);
+
+        verify(repository).findById(orderItemId);
+        verify(repository).delete(orderItem);
+
+    }
+
+    @Test
+    void erroDeletarPorId(){
+
+        UUID productId= UUID.randomUUID();
+        UUID orderId= UUID.randomUUID();
+        UUID userId= UUID.randomUUID();
+        UUID orderItemId= UUID.randomUUID();
+
+        Product product= new Product(productId,"Mouse","mouse para pc",new BigDecimal(125),12,new Category(UUID.randomUUID(),"Eletronicos"));
+        Order order=new Order(orderId,new Users(userId,
+                "Nicholas","nic@gmail.com","123",Role.USER), Status.WAITING_PAYMENT,new BigDecimal(125)
+                ,new ArrayList<>());
+        OrderItem orderItem=new OrderItem(orderItemId,order,product,1,new BigDecimal(125),new BigDecimal(125));
+
+        when(repository.findById(orderItemId)).thenThrow(new EntityNotFoundException("Order not found"));
+        assertThrows(EntityNotFoundException.class,()->service.deleteById(orderItemId));
+
+        verify(repository).findById(orderItemId);
+        verify(repository,never()).delete(orderItem);
+
+
+    }
+
+    @Test
+    void updateOrderItem(){
+
+        UUID productId= UUID.randomUUID();
+        UUID productIdd= UUID.randomUUID();
+        UUID orderId= UUID.randomUUID();
+        UUID userId= UUID.randomUUID();
+        UUID orderItemId= UUID.randomUUID();
+
+        Product product= new Product(productId,"Mouse","mouse para pc",new BigDecimal(125),12,new Category(UUID.randomUUID(),"Eletronicos"));
+        Order order=new Order(orderId,new Users(userId,
+                "Nicholas","nic@gmail.com","123",Role.USER), Status.WAITING_PAYMENT,new BigDecimal(125)
+                ,new ArrayList<>());
+        OrderItem orderItem=new OrderItem(orderItemId,
+                order, new Product(productIdd,"Teclado","teclado apra pc",new BigDecimal(55),
+                10,new Category(UUID.randomUUID(),"Eletronicos")),2,new BigDecimal(100),order.getTotal());
+
+
+        OrderItemRequestDTO requestDTO =new OrderItemRequestDTO(productId,2);
+        when(repository.findById(orderItemId)).thenReturn(Optional.of(orderItem));
+        when(productRepository.findById(productId)).thenReturn(Optional.of(product));
+
+        orderItem.setProduct(product);
+
+        OrderItemResponseDTO responseDTO= new OrderItemResponseDTO(orderItemId,productId,"Mouse",new BigDecimal(55),2,order.getTotal());
+        when(mapper.toResponse(orderItem)).thenReturn(responseDTO);
+        OrderItemResponseDTO result=service.update(orderItemId,requestDTO);
+
+
+        assertEquals("Mouse",result.productName());
+        assertEquals(productId, result.productId());
+        assertEquals(2, result.quantity());
+
+        verify(repository).findById(orderItemId);
+        verify(repository).save(any(OrderItem.class));
+
+
 
 
     }
