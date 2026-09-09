@@ -334,4 +334,23 @@ public class OrderItemServiceTest {
         verify(repository).save(any(OrderItem.class));
 
     }
+
+    @Test
+    void erroUpdateOrderItemOrderNotFound(){
+
+        UUID orderItemId= UUID.randomUUID();
+
+        when(repository.findById(orderItemId)).thenThrow(new EntityNotFoundException("OrderItem not found"));
+        assertThrows(EntityNotFoundException.class,()->service.update(orderItemId,any()));
+
+        verify(repository).findById(orderItemId);
+        verify(repository,never()).save(any());
+
+
+    }
+
+    @Test
+    void erroUpdateOrderItemProductNotFound(){
+
+    }
 }
