@@ -8,6 +8,7 @@ import io.github.nbgraciano.commerce_api.entity.mappers.OrderItemMapper;
 import io.github.nbgraciano.commerce_api.exception.EntityNotFoundException;
 import io.github.nbgraciano.commerce_api.repository.OrderItemRepository;
 import io.github.nbgraciano.commerce_api.repository.ProductRepository;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -339,9 +340,10 @@ public class OrderItemServiceTest {
     void erroUpdateOrderItemOrderNotFound(){
 
         UUID orderItemId= UUID.randomUUID();
+        OrderItemRequestDTO requestDTO= new OrderItemRequestDTO(orderItemId,2);
 
-        when(repository.findById(orderItemId)).thenThrow(new EntityNotFoundException("OrderItem not found"));
-        assertThrows(EntityNotFoundException.class,()->service.update(orderItemId,any()));
+        when(repository.findById(orderItemId)).thenReturn(Optional.empty());
+        assertThrows(EntityNotFoundException.class,()->service.update(orderItemId,requestDTO));
 
         verify(repository).findById(orderItemId);
         verify(repository,never()).save(any());
@@ -350,7 +352,28 @@ public class OrderItemServiceTest {
     }
 
     @Test
-    void erroUpdateOrderItemProductNotFound(){
+    void erroUpdateOrderItemProductNotFound() {
 
+        UUID productId = UUID.randomUUID();
+        UUID orderItemId = UUID.randomUUID();
+
+        OrderItem orderItem = mock(OrderItem.class);
+        OrderItemRequestDTO requestDTO =
+                new OrderItemRequestDTO(productId, 2);
+
+        when(repository.findById(orderItemId))
+                .thenReturn(Optional.of(orderItem));
+
+        when(productRepository.findById(productId))
+                .thenReturn(Optional.empty());
+
+        assertThrows(
+                EntityNotFoundException.class,
+                () -> service.update(orderItemId, requestDTO)
+        );
+
+        verify(productRepository).findById(productId);
+
+        verify(repository, never()).save(any(OrderItem.class));
     }
 }
