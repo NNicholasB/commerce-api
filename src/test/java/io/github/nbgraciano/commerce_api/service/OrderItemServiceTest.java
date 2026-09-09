@@ -45,6 +45,7 @@ public class OrderItemServiceTest {
     private OrderService orderService;
 
     @Test
+    @DisplayName("Realizar create")
     void criarOrderItem() {
 
         UUID productId = UUID.randomUUID();
@@ -124,6 +125,7 @@ public class OrderItemServiceTest {
     }
 
     @Test
+    @DisplayName("Deve lançar exceção quando chamar o metodo create e o Product não existir")
     void erroCriarOrderItemProdutoNaoEncontrado(){
 
         UUID orderId = UUID.randomUUID();
@@ -140,6 +142,7 @@ public class OrderItemServiceTest {
     }
 
     @Test
+    @DisplayName("Deve lançar exceção quando chamar o metodo create e o orderItem não existir")
     void erroCriarOrderItemOrderNaoEncontrado(){
 
         UUID orderId = UUID.randomUUID();
@@ -174,6 +177,7 @@ public class OrderItemServiceTest {
     }
 
     @Test
+    @DisplayName("Realizar busca pelo Id")
     void buscarPorId(){
 
         UUID productId= UUID.randomUUID();
@@ -199,7 +203,7 @@ public class OrderItemServiceTest {
 
     }
 
-    @Test
+    @Test@DisplayName("Deve lançar exceção quando não encontrar o OrderItem pelo Id")
     void erroBuscarPorIdOrderItemNaoEncontrada(){
 
         UUID productId= UUID.randomUUID();
@@ -222,6 +226,7 @@ public class OrderItemServiceTest {
     }
 
     @Test
+    @DisplayName("Realizar Buscar Por Todos")
     void buscarTodos(){
         UUID productId= UUID.randomUUID();
         UUID orderId= UUID.randomUUID();
@@ -254,6 +259,8 @@ public class OrderItemServiceTest {
     }
 
     @Test
+    @DisplayName("Realizar delete pelo Id")
+
     void deletarPorId(){
 
         UUID productId= UUID.randomUUID();
@@ -276,6 +283,7 @@ public class OrderItemServiceTest {
     }
 
     @Test
+    @DisplayName("Deve lançar exceção quando o metodo delete não conseguir encontrar o productId")
     void erroDeletarPorId(){
 
         UUID productId= UUID.randomUUID();
@@ -299,6 +307,7 @@ public class OrderItemServiceTest {
     }
 
     @Test
+    @DisplayName("Realizar update normal de OrderItem")
     void updateOrderItem(){
 
         UUID productId= UUID.randomUUID();
@@ -337,6 +346,7 @@ public class OrderItemServiceTest {
     }
 
     @Test
+    @DisplayName("Deve lançar exceção quando o OrderItem não existir")
     void erroUpdateOrderItemOrderNotFound(){
 
         UUID orderItemId= UUID.randomUUID();
@@ -352,6 +362,7 @@ public class OrderItemServiceTest {
     }
 
     @Test
+    @DisplayName("Deve lançar exceção quando o produto não existir")
     void erroUpdateOrderItemProductNotFound() {
 
         UUID productId = UUID.randomUUID();
