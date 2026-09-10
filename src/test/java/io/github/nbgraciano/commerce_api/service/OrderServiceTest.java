@@ -147,4 +147,19 @@ public class OrderServiceTest {
         verify(repository).save(any(Order.class));
         verify(mapper).toResponse(any(Order.class));
     }
+
+    @Test
+    @DisplayName("Deve lançar exceção quando nao encontrar o User")
+    void erroCreateOrderUserNotFound(){
+
+        UUID userId=UUID.randomUUID();
+
+        when(usersRepository.findById(userId)).thenReturn(Optional.empty());
+        OrderRequestDTO requestDTO =
+                new OrderRequestDTO(userId, List.of());
+        assertThrows(EntityNotFoundException.class,()->service.create(requestDTO));
+
+        verify(repository,never()).save(any());
+    }
+
 }
