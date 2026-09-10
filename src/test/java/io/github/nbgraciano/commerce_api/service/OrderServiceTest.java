@@ -2,6 +2,7 @@ package io.github.nbgraciano.commerce_api.service;
 
 
 import io.github.nbgraciano.commerce_api.entity.*;
+import io.github.nbgraciano.commerce_api.entity.dto.Order.OrderRequestDTO;
 import io.github.nbgraciano.commerce_api.entity.dto.Order.OrderResponseDTO;
 import io.github.nbgraciano.commerce_api.entity.mappers.OrderItemMapper;
 import io.github.nbgraciano.commerce_api.entity.mappers.OrderMapper;
@@ -91,5 +92,59 @@ public class OrderServiceTest {
 
         verify(repository).findById(orderId);
         verify(mapper,never()).toResponse(order);
+    }
+
+    @DisplayName("Realizar o create normal")
+    @Test
+    void createOrder() {
+
+        UUID userId = UUID.randomUUID();
+        UUID orderId = UUID.randomUUID();
+
+        Users user = new Users(
+                userId,
+                "Nicholas",
+                "nic@gmail.com",
+                "123",
+                Role.USER
+        );
+
+        OrderRequestDTO requestDTO =
+                new OrderRequestDTO(userId, List.of());
+
+        when(usersRepository.findById(userId))
+                .thenReturn(Optional.of(user));
+
+        when(repository.save(any(Order.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        Order order = new Order(orderId,
+                user,
+                Status.WAITING_PAYMENT,
+                new BigDecimal(125),
+                List.of()
+        );
+
+        OrderResponseDTO responseDTO =new OrderResponseDTO(
+                        orderId,
+                        userId,
+                        Status.WAITING_PAYMENT,
+                        new BigDecimal(125),
+                        List.of()
+                );
+
+        when(mapper.toResponse(any(Order.class)))
+                .thenReturn(responseDTO);
+
+
+        OrderResponseDTO result = service.create(requestDTO);
+
+
+        assertEquals(userId, result.userId());
+        assertEquals(orderId, result.id());
+
+
+        verify(repository).save(any(Order.class));
+        verify(mapper).toResponse(any(Order.class));
     }
 }
