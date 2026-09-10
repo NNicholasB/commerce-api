@@ -162,4 +162,36 @@ public class OrderServiceTest {
         verify(repository,never()).save(any());
     }
 
+    @Test
+    @DisplayName("Realizar o delete pelo Id normal")
+    void deleteById(){
+
+        UUID userId = UUID.randomUUID();
+        UUID orderId = UUID.randomUUID();
+
+        Users user = new Users(
+                userId,
+                "Nicholas",
+                "nic@gmail.com",
+                "123",
+                Role.USER
+        );
+
+        Order order = new Order(orderId,
+                user,
+                Status.WAITING_PAYMENT,
+                new BigDecimal(125),
+                List.of()
+        );
+
+        when(repository.findById(orderId)).thenReturn(Optional.of(order));
+        doNothing().when(repository).delete(order);
+
+        service.deleteById(orderId);
+
+        verify(repository).findById(orderId);
+        verify(repository).delete(order);
+
+
+    }
 }
