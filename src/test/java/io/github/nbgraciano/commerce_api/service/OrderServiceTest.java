@@ -194,4 +194,57 @@ public class OrderServiceTest {
 
 
     }
+    @Test
+    @DisplayName("Deve lançar exceção quando nao encontrar a Order")
+    void erroDeleteByIdOrderNotFound(){
+
+        UUID userId = UUID.randomUUID();
+        UUID orderId = UUID.randomUUID();
+
+        Users user = new Users(
+                userId,
+                "Nicholas",
+                "nic@gmail.com",
+                "123",
+                Role.USER
+        );
+
+        Order order = new Order(orderId,
+                user,
+                Status.WAITING_PAYMENT,
+                new BigDecimal(125),
+                List.of()
+        );
+        when(repository.findById(orderId)).thenReturn(Optional.empty());
+        assertThrows(EntityNotFoundException.class,()->service.deleteById(orderId));
+
+        verify(repository,never()).deleteById(orderId);
+
+    }
+
+    @Test
+    @DisplayName("Não deve deletar pedido que já foi pago")
+    void erroDeleteByIdStatus() {
+
+        UUID orderId = UUID.randomUUID();
+
+        Order order = new Order();
+        order.setId(orderId);
+        order.setStatus(Status.PAID);
+
+        when(repository.findById(orderId))
+                .thenReturn(Optional.of(order));
+
+        IllegalStateException exception = assertThrows(
+                IllegalStateException.class,
+                () -> service.deleteById(orderId)
+        );
+
+        assertEquals(
+                "Only orders waiting for payment can be deleted",
+                exception.getMessage()
+        );
+
+        verify(repository, never()).delete(order);
+    }
 }
