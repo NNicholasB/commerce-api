@@ -5,6 +5,7 @@ import io.github.nbgraciano.commerce_api.entity.*;
 import io.github.nbgraciano.commerce_api.entity.dto.Order.OrderResponseDTO;
 import io.github.nbgraciano.commerce_api.entity.mappers.OrderItemMapper;
 import io.github.nbgraciano.commerce_api.entity.mappers.OrderMapper;
+import io.github.nbgraciano.commerce_api.exception.EntityNotFoundException;
 import io.github.nbgraciano.commerce_api.repository.OrderItemRepository;
 import io.github.nbgraciano.commerce_api.repository.OrderRepository;
 import io.github.nbgraciano.commerce_api.repository.ProductRepository;
@@ -23,6 +24,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -71,5 +73,23 @@ public class OrderServiceTest {
         verify(repository).findById(order.getId());
         verify(mapper).toResponse(order);
 
+    }
+
+    @Test
+    @DisplayName("Deve lançar exceção quando nao encontrar a Order pelo Id")
+    void erroFindById(){
+        UUID orderId= UUID.randomUUID();
+        UUID userId= UUID.randomUUID();
+
+        Users user=new Users(userId,"Nicholas","nic@gmail.com","123", Role.USER);
+        Order order= new Order(orderId,user,Status.PAID,new BigDecimal(15), List.of());
+        order.setStatus(Status.PAID);
+
+        when(repository.findById(orderId)).thenReturn(Optional.empty());
+
+        assertThrows(EntityNotFoundException.class,()->service.findById(orderId));
+
+        verify(repository).findById(orderId);
+        verify(mapper,never()).toResponse(order);
     }
 }
