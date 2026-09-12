@@ -4,6 +4,7 @@ package io.github.nbgraciano.commerce_api.service;
 import io.github.nbgraciano.commerce_api.entity.*;
 import io.github.nbgraciano.commerce_api.entity.dto.Order.OrderRequestDTO;
 import io.github.nbgraciano.commerce_api.entity.dto.Order.OrderResponseDTO;
+import io.github.nbgraciano.commerce_api.entity.dto.OrderItem.OrderItemRequestDTO;
 import io.github.nbgraciano.commerce_api.entity.mappers.OrderItemMapper;
 import io.github.nbgraciano.commerce_api.entity.mappers.OrderMapper;
 import io.github.nbgraciano.commerce_api.exception.EntityNotFoundException;
@@ -24,8 +25,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -246,5 +246,73 @@ public class OrderServiceTest {
         );
 
         verify(repository, never()).delete(order);
+    }
+
+    @Test
+    @DisplayName("Realizar update normal")
+    void update(){
+        UUID userId = UUID.randomUUID();
+        UUID orderId = UUID.randomUUID();
+        UUID productId = UUID.randomUUID();
+
+        Users user = new Users(
+                userId,
+                "Nicholas",
+                "nic@gmail.com",
+                "123",
+                Role.USER
+        );
+
+        Order order = new Order(orderId,
+                user,
+                Status.WAITING_PAYMENT,
+                new BigDecimal(125),
+                List.of()
+        );
+
+        Product product=new Product(productId,
+                "Mouse",
+                "mouse de pc",
+                new BigDecimal("125"),
+                5,
+                new Category(
+                        UUID.randomUUID(),
+                        "Eletronicos"
+                ));
+
+        OrderItemRequestDTO itemRequest =
+                new OrderItemRequestDTO(
+                        productId,
+                        2
+                );
+
+        OrderRequestDTO requestDTO =
+                new OrderRequestDTO(
+                        userId,
+                        List.of(itemRequest)
+                );
+
+        when(repository.findById(orderId)).thenReturn(Optional.of(order));
+        when(productRepository.findById(productId)).thenReturn(Optional.of(product));
+        OrderResponseDTO responseDTO=new OrderResponseDTO(orderId,userId,Status.WAITING_PAYMENT,
+                new BigDecimal(250),
+                List.of());
+        when(mapper.toResponse(order)).thenReturn(responseDTO);
+        when(repository.save(order))
+                .thenReturn(order);
+
+        OrderResponseDTO result=service.update(order.getId(),requestDTO);
+
+
+        assertNotNull(result);
+
+        assertEquals(orderId, result.id());
+        assertEquals(userId, result.userId());
+        assertEquals(Status.WAITING_PAYMENT, result.status());
+        assertEquals(new BigDecimal("250"), result.total());
+
+        verify(repository).save(order);
+        verify(mapper).toResponse(order);
+
     }
 }
