@@ -571,5 +571,39 @@ public class OrderServiceTest {
         verify(mapper,never()).toResponse(any(Order.class));
     }
 
+    @Test
+    @DisplayName("Deve lancar excecao status Order nao for WAITING_PAYMENT")
+    void ErroShipStatus(){
+
+        UUID orderId = UUID.randomUUID();
+        UUID userId = UUID.randomUUID();
+
+
+        Users user = new Users(
+                userId,
+                "Nicholas",
+                "nic@gmail.com",
+                "123",
+                Role.USER
+        );
+
+        Order order = new Order(orderId,
+                user,
+                Status.DELIVERED,
+                new BigDecimal(125),
+                List.of()
+        );
+
+        when(repository.findById(orderId)).thenReturn(Optional.of(order));
+
+        BusinessException ex = assertThrows(BusinessException.class, () -> service.ship(orderId));
+
+        assertEquals("Only paid orders can be shipped",ex.getMessage());
+
+        System.out.println(ex.getMessage());
+        verify(repository,never()).save(any(Order.class));
+        verify(mapper,never()).toResponse(any(Order.class));
+    }
+
 
 }
