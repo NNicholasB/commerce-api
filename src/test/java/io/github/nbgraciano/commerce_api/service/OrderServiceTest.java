@@ -605,5 +605,54 @@ public class OrderServiceTest {
         verify(mapper,never()).toResponse(any(Order.class));
     }
 
+    @Test
+    @DisplayName("Realizar alteracao no status da Order para deliver")
+    void deliver(){
+
+        UUID orderId = UUID.randomUUID();
+        UUID userId = UUID.randomUUID();
+
+
+        Users user = new Users(
+                userId,
+                "Nicholas",
+                "nic@gmail.com",
+                "123",
+                Role.USER
+        );
+
+        Order order = new Order(orderId,
+                user,
+                Status.SHIPPED,
+                new BigDecimal(125),
+                List.of()
+        );
+
+        OrderResponseDTO responseDTO=new OrderResponseDTO(
+                orderId,userId,Status.DELIVERED,
+                new BigDecimal(250),
+                List.of());
+
+
+        when(repository.findById(orderId)).thenReturn(Optional.of(order));
+        when(mapper.toResponse(order)).thenReturn(responseDTO);
+        when(repository.save(order)).thenReturn(order);
+
+        OrderResponseDTO result=service.deliver(orderId);
+
+        assertEquals(Status.DELIVERED,result.status());
+
+        assertNotNull(result);
+
+        assertEquals(orderId,result.id());
+        assertEquals(userId,result.userId());
+
+        verify(repository).findById(orderId);
+        verify(repository).save(order);
+        verify(mapper).toResponse(order);
+
+    }
+
+
 
 }
