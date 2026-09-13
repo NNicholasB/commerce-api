@@ -460,6 +460,20 @@ public class OrderServiceTest {
 
     }
 
+    @Test
+    @DisplayName("Deve lancar excecao ao nao localizar a Order")
+    void erroCancel(){
+        UUID orderId= UUID.randomUUID();
+        when(repository.findById(orderId)).thenReturn(Optional.empty());
+        EntityNotFoundException ex = assertThrows(EntityNotFoundException.class, () -> service.pay(orderId));
 
+        assertEquals(
+                "Order not found",
+                ex.getMessage()
+        );
+        System.out.println(ex.getMessage());
+        verify(repository,never()).save(any(Order.class));
+        verify(mapper,never()).toResponse(any(Order.class));
+    }
 
 }
