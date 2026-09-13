@@ -555,5 +555,21 @@ public class OrderServiceTest {
         verify(mapper).toResponse(order);
 
     }
+    @Test
+    @DisplayName("Deve lancar excecao ao nao localizar a Order")
+    void erroShip(){
+        UUID orderId= UUID.randomUUID();
+        when(repository.findById(orderId)).thenReturn(Optional.empty());
+        EntityNotFoundException ex = assertThrows(EntityNotFoundException.class, () -> service.ship(orderId));
+
+        assertEquals(
+                "Order not found",
+                ex.getMessage()
+        );
+        System.out.println(ex.getMessage());
+        verify(repository,never()).save(any(Order.class));
+        verify(mapper,never()).toResponse(any(Order.class));
+    }
+
 
 }
