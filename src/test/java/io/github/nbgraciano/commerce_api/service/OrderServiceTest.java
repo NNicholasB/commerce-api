@@ -7,6 +7,7 @@ import io.github.nbgraciano.commerce_api.entity.dto.Order.OrderResponseDTO;
 import io.github.nbgraciano.commerce_api.entity.dto.OrderItem.OrderItemRequestDTO;
 import io.github.nbgraciano.commerce_api.entity.mappers.OrderItemMapper;
 import io.github.nbgraciano.commerce_api.entity.mappers.OrderMapper;
+import io.github.nbgraciano.commerce_api.exception.BusinessException;
 import io.github.nbgraciano.commerce_api.exception.EntityNotFoundException;
 import io.github.nbgraciano.commerce_api.repository.OrderItemRepository;
 import io.github.nbgraciano.commerce_api.repository.OrderRepository;
@@ -375,4 +376,40 @@ public class OrderServiceTest {
         verify(repository,never()).save(any(Order.class));
         verify(mapper,never()).toResponse(any(Order.class));
     }
+
+    @Test
+    @DisplayName("Deve lancar excecao status Order nao for WAITING_PAYMENT")
+    void ErroPayStatus(){
+
+        UUID orderId = UUID.randomUUID();
+        UUID userId = UUID.randomUUID();
+
+
+        Users user = new Users(
+                userId,
+                "Nicholas",
+                "nic@gmail.com",
+                "123",
+                Role.USER
+        );
+
+        Order order = new Order(orderId,
+                user,
+                Status.DELIVERED,
+                new BigDecimal(125),
+                List.of()
+        );
+
+        when(repository.findById(orderId)).thenReturn(Optional.of(order));
+
+        BusinessException ex = assertThrows(BusinessException.class, () -> service.pay(orderId));
+
+        assertEquals("Order is not waiting for payment",ex.getMessage());
+
+        System.out.println(ex.getMessage());
+        verify(repository,never()).save(any(Order.class));
+        verify(mapper,never()).toResponse(any(Order.class));
+    }
+
+
 }
