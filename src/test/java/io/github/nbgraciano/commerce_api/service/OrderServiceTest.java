@@ -315,4 +315,48 @@ public class OrderServiceTest {
         verify(mapper).toResponse(order);
 
     }
+
+    @Test
+    @DisplayName("Realizar alteracao no status da Order para pay")
+    void pay(){
+
+        UUID orderId = UUID.randomUUID();
+        UUID userId = UUID.randomUUID();
+
+
+        Users user = new Users(
+                userId,
+                "Nicholas",
+                "nic@gmail.com",
+                "123",
+                Role.USER
+        );
+
+        Order order = new Order(orderId,
+                user,
+                Status.WAITING_PAYMENT,
+                new BigDecimal(125),
+                List.of()
+        );
+
+        OrderResponseDTO responseDTO=new OrderResponseDTO(orderId,userId,Status.PAID,
+                new BigDecimal(250),
+                List.of());
+
+        when(repository.findById(orderId)).thenReturn(Optional.of(order));
+        when(mapper.toResponse(order)).thenReturn(responseDTO);
+        when(repository.save(order)).thenReturn(order);
+
+        OrderResponseDTO result=service.pay(orderId);
+
+        assertNotNull(result);
+
+        assertEquals(orderId,result.id());
+        assertEquals(userId,result.userId());
+        assertEquals(Status.PAID,result.status());
+
+        verify(repository).findById(orderId);
+        verify(repository).save(order);
+        verify(mapper).toResponse(order);
+    }
 }
