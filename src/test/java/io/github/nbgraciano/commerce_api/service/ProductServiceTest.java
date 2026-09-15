@@ -1,14 +1,65 @@
 package io.github.nbgraciano.commerce_api.service;
 
 
+import io.github.nbgraciano.commerce_api.entity.Category;
+import io.github.nbgraciano.commerce_api.entity.Product;
+import io.github.nbgraciano.commerce_api.entity.dto.Category.CategoryResponseDTO;
+import io.github.nbgraciano.commerce_api.entity.dto.Product.ProductResponseDTO;
+import io.github.nbgraciano.commerce_api.entity.mappers.ProductMapper;
+import io.github.nbgraciano.commerce_api.repository.CategoryRepository;
 import io.github.nbgraciano.commerce_api.repository.ProductRepository;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.math.BigDecimal;
+import java.util.Optional;
+import java.util.UUID;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class ProductServiceTest {
 
     @Mock
-    ProductRepository repository;
+    private ProductRepository repository;
+
+    @Mock
+    private CategoryRepository categoryRepository;
+
+    @InjectMocks
+    private ProductService service;
+
+    @Mock
+    private ProductMapper mapper;
+
+    @Test
+    @DisplayName("Encontrar Product pelo Id")
+    void findById(){
+        UUID productId=UUID.randomUUID();
+        UUID categoryId=UUID.randomUUID();
+
+        Category category= new Category(categoryId,"Eletronicos");
+        CategoryResponseDTO categoryResponse= new CategoryResponseDTO(categoryId,"Eletronicos");
+        Product product=new Product(productId,"Mouse","mouse gamer",new BigDecimal(150),10,category);
+        ProductResponseDTO responseDTO=new ProductResponseDTO(productId,"Mouse","mouse gamer",new BigDecimal(150),10,categoryResponse);
+        when(repository.findById(productId)).thenReturn(Optional.of(product));
+        when(mapper.toResponse(product)).thenReturn(responseDTO);
+
+        ProductResponseDTO result= service.findById(productId);
+
+        assertEquals(productId,result.id());
+        assertEquals("Mouse",result.name());
+
+        verify(repository).findById(productId);
+        verify(mapper).toResponse(product);
+    }
+
 }
