@@ -4,6 +4,7 @@ package io.github.nbgraciano.commerce_api.service;
 import io.github.nbgraciano.commerce_api.entity.Category;
 import io.github.nbgraciano.commerce_api.entity.Product;
 import io.github.nbgraciano.commerce_api.entity.dto.Category.CategoryResponseDTO;
+import io.github.nbgraciano.commerce_api.entity.dto.Product.ProductRequestDTO;
 import io.github.nbgraciano.commerce_api.entity.dto.Product.ProductResponseDTO;
 import io.github.nbgraciano.commerce_api.entity.mappers.ProductMapper;
 import io.github.nbgraciano.commerce_api.exception.EntityNotFoundException;
@@ -73,5 +74,32 @@ public class ProductServiceTest {
         assertEquals("Product not found",ex.getMessage());
 
         verify(mapper,never()).toResponse(any(Product.class));
+    }
+
+    @Test
+    @DisplayName("Deve criar Product")
+    void create(){
+        UUID categoryId=UUID.randomUUID();
+        UUID productId=UUID.randomUUID();
+
+        Category category= new Category(categoryId,"Eletronicos");
+        CategoryResponseDTO categoryResponse= new CategoryResponseDTO(categoryId,"Eletronicos");
+
+        Product product=new Product(productId,"Mouse","mouse gamer",new BigDecimal(150),10,category);
+        ProductRequestDTO requestDTO= new ProductRequestDTO("Mouse","mouse gamer",new BigDecimal(150),10,categoryId);
+        ProductResponseDTO responseDTO= new ProductResponseDTO(productId,"Mouse","mouse gamer",new BigDecimal(150),10,categoryResponse);
+
+        when(repository.existsByNameAndCategoryId(requestDTO.name(),requestDTO.categoryId())).thenReturn(false);
+        when(categoryRepository.findById(categoryId)).thenReturn(Optional.of(category));
+        when(mapper.toEntity(requestDTO)).thenReturn(product);
+        when(mapper.toResponse(product)).thenReturn(responseDTO);
+        when(repository.save(product)).thenReturn(product);
+        ProductResponseDTO result=service.create(requestDTO);
+
+        assertEquals("Mouse",result.name());
+        assertEquals("Eletronicos",result.category().name());
+
+        verify(repository).save(product);
+
     }
 }
