@@ -246,4 +246,60 @@ public class ProductServiceTest {
 
 
     }
+
+    @Test
+    @DisplayName("Deve realiar o update")
+    void update(){
+        UUID productId = UUID.randomUUID();
+        UUID categoryId = UUID.randomUUID();
+
+        Category category = new Category(
+                categoryId,
+                "Eletronicos"
+        );
+
+        Product product = new Product(
+                productId,
+                "Mouse",
+                "mouse gamer",
+                new BigDecimal("150"),
+                10,
+                category
+        );
+
+        CategoryResponseDTO categoryResponse =
+                new CategoryResponseDTO(
+                        categoryId,
+                        "Eletronicos"
+                );
+
+        ProductResponseDTO responseDTO =
+                new ProductResponseDTO(
+                        productId,
+                        "Teclado",
+                        "teclado gamer",
+                        new BigDecimal("350"),
+                        5,
+                        categoryResponse
+                );
+        ProductRequestDTO requestDTO= new ProductRequestDTO(
+                "Teclado",
+                "teclado gamer",
+                new BigDecimal("350"),
+                5,
+                categoryId
+        );
+        when(repository.existsByNameAndCategoryIdAndIdNot(requestDTO.name(),requestDTO.categoryId(),productId)).thenReturn(false);
+        when(repository.findById(productId)).thenReturn(Optional.of(product));
+        when(categoryRepository.findById(requestDTO.categoryId())).thenReturn(Optional.of(category));
+        when(mapper.toResponse(product)).thenReturn(responseDTO);
+        when(repository.save(product)).thenReturn(product);
+
+        ProductResponseDTO result=service.update(productId,requestDTO);
+        assertEquals("Teclado",result.name());
+        assertEquals("teclado gamer",result.description());
+
+        verify(repository).findById(productId);
+        verify(mapper).toResponse(product);
+    }
 }
