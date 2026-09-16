@@ -19,11 +19,11 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -149,5 +149,60 @@ public class ProductServiceTest {
         verify(repository,never()).save(product);
         verify(mapper,never()).toResponse(product);
         verify(mapper,never()).toEntity(requestDTO);
+    }
+
+    @Test
+    @DisplayName("Deve retornar todos Product")
+    void findAll() {
+
+        UUID productId = UUID.randomUUID();
+        UUID categoryId = UUID.randomUUID();
+
+        Category category = new Category(
+                categoryId,
+                "Eletronicos"
+        );
+
+        Product product = new Product(
+                productId,
+                "Mouse",
+                "mouse gamer",
+                new BigDecimal("150"),
+                10,
+                category
+        );
+
+        CategoryResponseDTO categoryResponse =
+                new CategoryResponseDTO(
+                        categoryId,
+                        "Eletronicos"
+                );
+
+        ProductResponseDTO responseDTO =
+                new ProductResponseDTO(
+                        productId,
+                        "Mouse",
+                        "mouse gamer",
+                        new BigDecimal("150"),
+                        10,
+                        categoryResponse
+                );
+
+        when(repository.findAll())
+                .thenReturn(List.of(product));
+
+        when(mapper.toResponse(List.of(product)))
+                .thenReturn(List.of(responseDTO));
+
+        List<ProductResponseDTO> result =
+                service.findAll(null, null);
+
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertEquals(responseDTO, result.get(0));
+
+        verify(repository).findAll();
+
+        verify(mapper).toResponse(List.of(product));
     }
 }
