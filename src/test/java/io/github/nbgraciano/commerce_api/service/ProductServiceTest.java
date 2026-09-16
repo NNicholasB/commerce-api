@@ -7,6 +7,7 @@ import io.github.nbgraciano.commerce_api.entity.dto.Category.CategoryResponseDTO
 import io.github.nbgraciano.commerce_api.entity.dto.Product.ProductRequestDTO;
 import io.github.nbgraciano.commerce_api.entity.dto.Product.ProductResponseDTO;
 import io.github.nbgraciano.commerce_api.entity.mappers.ProductMapper;
+import io.github.nbgraciano.commerce_api.exception.DuplicateEntityException;
 import io.github.nbgraciano.commerce_api.exception.EntityNotFoundException;
 import io.github.nbgraciano.commerce_api.repository.CategoryRepository;
 import io.github.nbgraciano.commerce_api.repository.ProductRepository;
@@ -102,4 +103,28 @@ public class ProductServiceTest {
         verify(repository).save(product);
 
     }
+
+    @Test
+    @DisplayName("Deve lancar exceção ao existsByNameAndCategoryId")
+    void erroCreate(){
+        UUID categoryId=UUID.randomUUID();
+        UUID productId=UUID.randomUUID();
+
+        Category category= new Category(categoryId,"Eletronicos");
+        CategoryResponseDTO categoryResponse= new CategoryResponseDTO(categoryId,"Eletronicos");
+
+        Product product=new Product(productId,"Mouse","mouse gamer",new BigDecimal(150),10,category);
+        ProductRequestDTO requestDTO= new ProductRequestDTO("Mouse","mouse gamer",new BigDecimal(150),10,categoryId);
+
+        when(repository.existsByNameAndCategoryId(requestDTO.name(),requestDTO.categoryId())).thenReturn(true);
+        DuplicateEntityException ex = assertThrows(DuplicateEntityException.class, () -> service.create(requestDTO));
+
+        assertEquals("Product already exists",ex.getMessage());
+
+      verify(repository,never()).save(product);
+      verify(mapper,never()).toEntity(requestDTO);
+        verify(mapper,never()).toResponse(product);
+
+    }
+
 }
