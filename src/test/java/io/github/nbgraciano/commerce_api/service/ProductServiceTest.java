@@ -232,4 +232,18 @@ public class ProductServiceTest {
         verify(repository).findById(productId);
 
     }
+
+    @Test
+    @DisplayName("Deve lancar excecao ao nao encontrar o Product")
+    void erroDelete(){
+        UUID productId = UUID.randomUUID();
+        when(repository.findById(productId)).thenReturn(Optional.empty());
+        EntityNotFoundException ex = assertThrows(EntityNotFoundException.class, () -> service.delete(productId));
+
+        assertEquals("Product not found",ex.getMessage());
+
+        verify(repository,never()).delete(any(Product.class));
+
+
+    }
 }
