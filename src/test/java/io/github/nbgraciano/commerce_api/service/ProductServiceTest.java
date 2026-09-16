@@ -205,4 +205,31 @@ public class ProductServiceTest {
 
         verify(mapper).toResponse(List.of(product));
     }
+
+    @Test
+    @DisplayName("Deve realizar o delete")
+    void delete(){
+        UUID productId = UUID.randomUUID();
+        UUID categoryId = UUID.randomUUID();
+
+        Category category = new Category(
+                categoryId,
+                "Eletronicos"
+        );
+
+        Product product = new Product(
+                productId,
+                "Mouse",
+                "mouse gamer",
+                new BigDecimal("150"),
+                10,
+                category
+        );
+        when(repository.findById(productId)).thenReturn(Optional.of(product));
+
+        service.delete(productId);
+
+        verify(repository).findById(productId);
+
+    }
 }
