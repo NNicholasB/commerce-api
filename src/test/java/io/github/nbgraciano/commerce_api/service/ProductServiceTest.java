@@ -6,6 +6,7 @@ import io.github.nbgraciano.commerce_api.entity.Product;
 import io.github.nbgraciano.commerce_api.entity.dto.Category.CategoryResponseDTO;
 import io.github.nbgraciano.commerce_api.entity.dto.Product.ProductResponseDTO;
 import io.github.nbgraciano.commerce_api.entity.mappers.ProductMapper;
+import io.github.nbgraciano.commerce_api.exception.EntityNotFoundException;
 import io.github.nbgraciano.commerce_api.repository.CategoryRepository;
 import io.github.nbgraciano.commerce_api.repository.ProductRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -22,8 +23,7 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class ProductServiceTest {
@@ -62,4 +62,16 @@ public class ProductServiceTest {
         verify(mapper).toResponse(product);
     }
 
+    @Test
+    @DisplayName("Deve lancar exceção ao nao encontrar o Product")
+    void erroFindById(){
+        UUID productId=UUID.randomUUID();
+
+        when(repository.findById(productId)).thenReturn(Optional.empty());
+        EntityNotFoundException ex = assertThrows(EntityNotFoundException.class, () -> service.findById(productId));
+
+        assertEquals("Product not found",ex.getMessage());
+
+        verify(mapper,never()).toResponse(any(Product.class));
+    }
 }
