@@ -127,4 +127,27 @@ public class ProductServiceTest {
 
     }
 
+    @Test
+    @DisplayName("Deve lancar exceção ao nao encontrar Category")
+    void erroCreateCategory(){
+        UUID categoryId=UUID.randomUUID();
+        UUID productId=UUID.randomUUID();
+
+        Category category= new Category(categoryId,"Eletronicos");
+        CategoryResponseDTO categoryResponse= new CategoryResponseDTO(categoryId,"Eletronicos");
+
+        Product product=new Product(productId,"Mouse","mouse gamer",new BigDecimal(150),10,category);
+        ProductRequestDTO requestDTO= new ProductRequestDTO("Mouse","mouse gamer",new BigDecimal(150),10,categoryId);
+
+        when(repository.existsByNameAndCategoryId(requestDTO.name(),requestDTO.categoryId())).thenReturn(false);
+        when(categoryRepository.findById(categoryId)).thenReturn(Optional.empty());
+
+        EntityNotFoundException ex = assertThrows(EntityNotFoundException.class, () -> service.create(requestDTO));
+
+        assertEquals("Category not found",ex.getMessage());
+
+        verify(repository,never()).save(product);
+        verify(mapper,never()).toResponse(product);
+        verify(mapper,never()).toEntity(requestDTO);
+    }
 }
