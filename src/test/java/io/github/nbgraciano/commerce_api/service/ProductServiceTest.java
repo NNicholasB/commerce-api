@@ -248,7 +248,7 @@ public class ProductServiceTest {
     }
 
     @Test
-    @DisplayName("Deve realizar o update")
+    @DisplayName("Deve realizgar o update")
     void update(){
         UUID productId = UUID.randomUUID();
         UUID categoryId = UUID.randomUUID();
@@ -302,4 +302,29 @@ public class ProductServiceTest {
         verify(repository).findById(productId);
         verify(mapper).toResponse(product);
     }
+
+    @Test
+    @DisplayName("Deve lancar excecao ao existir")
+    void erroUpdateExist(){
+        UUID categoryId=UUID.randomUUID();
+        UUID productId=UUID.randomUUID();
+
+        ProductRequestDTO requestDTO= new ProductRequestDTO(
+                "Teclado",
+                "teclado gamer",
+                new BigDecimal("350"),
+                5,
+                categoryId
+        );
+
+        when(repository.existsByNameAndCategoryIdAndIdNot(requestDTO.name(),requestDTO.categoryId(),productId)).thenReturn(true);
+        DuplicateEntityException ex = assertThrows(DuplicateEntityException.class, () -> service.update(productId, requestDTO));
+        assertEquals("Product already exists",ex.getMessage());
+
+        verify(repository,never()).save(any(Product.class));
+        verify(mapper,never()).toResponse(any(Product.class));
+
+
+    }
+
 }
