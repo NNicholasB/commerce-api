@@ -2,6 +2,7 @@ package io.github.nbgraciano.commerce_api.service;
 
 import io.github.nbgraciano.commerce_api.entity.Role;
 import io.github.nbgraciano.commerce_api.entity.Users;
+import io.github.nbgraciano.commerce_api.entity.dto.Users.UsersRequestDTO;
 import io.github.nbgraciano.commerce_api.entity.dto.Users.UsersResponseDTO;
 import io.github.nbgraciano.commerce_api.entity.mappers.UsersMapper;
 import io.github.nbgraciano.commerce_api.exception.EntityNotFoundException;
@@ -69,5 +70,27 @@ public class UsersServiceTest {
         verify(mapper,never()).toResponse(user);
     }
 
+    @Test
+    @DisplayName("Deve criar User")
+    void create(){
+        UUID userId=UUID.randomUUID();
+        Users user=new Users(userId,"Nicholas","nic@gmail.com","12345678", Role.USER);
+        UsersRequestDTO requestDTO= new UsersRequestDTO("Nicholas","12345678","nic@gmial.com");
+        UsersResponseDTO responseDTO= new UsersResponseDTO(userId,"Nicholas","nic@gmail.com","12345678");
+
+        when(repository.existsByNameAndEmail(requestDTO.name(),requestDTO.email())).thenReturn(false);
+        when(mapper.toResponse(user)).thenReturn(responseDTO);
+        when(encoder.encode(requestDTO.password())).thenReturn(requestDTO.password());
+        when(repository.save(user)).thenReturn(user);
+        when(mapper.toEntity(requestDTO)).thenReturn(user);
+
+        UsersResponseDTO result=service.create(requestDTO);
+
+        assertEquals("Nicholas",result.name());
+        assertEquals("nic@gmail.com",result.email());
+
+        verify(mapper).toResponse(user);
+
+    }
 
 }
