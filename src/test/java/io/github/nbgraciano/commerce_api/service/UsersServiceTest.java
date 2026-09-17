@@ -4,6 +4,7 @@ import io.github.nbgraciano.commerce_api.entity.Role;
 import io.github.nbgraciano.commerce_api.entity.Users;
 import io.github.nbgraciano.commerce_api.entity.dto.Users.UsersResponseDTO;
 import io.github.nbgraciano.commerce_api.entity.mappers.UsersMapper;
+import io.github.nbgraciano.commerce_api.exception.EntityNotFoundException;
 import io.github.nbgraciano.commerce_api.repository.UsersRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,8 +18,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class UsersServiceTest {
@@ -53,6 +54,20 @@ public class UsersServiceTest {
         verify(mapper).toResponse(user);
     }
 
+    @Test
+    @DisplayName("Deve lancar excecao ao nao encontrar User pelo id")
+    void erroFindById(){
+        UUID userId=UUID.randomUUID();
+        Users user=new Users(userId,"Nicholas","nic@gmail.com","12345678", Role.USER);
+        UsersResponseDTO responseDTO= new UsersResponseDTO(userId,"Nicholas","nic@gmail.com","12345678");
+        when(repository.findById(userId)).thenReturn(Optional.empty());
+
+        EntityNotFoundException ex = assertThrows(EntityNotFoundException.class, () -> service.findById(userId));
+
+        assertEquals("User not found",ex.getMessage());
+
+        verify(mapper,never()).toResponse(user);
+    }
 
 
 }
