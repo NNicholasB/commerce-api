@@ -323,8 +323,32 @@ public class ProductServiceTest {
 
         verify(repository,never()).save(any(Product.class));
         verify(mapper,never()).toResponse(any(Product.class));
-
-
     }
+
+    @Test
+    @DisplayName("Deve lancar excecao ao nao encontrar o Product")
+    void erroUpdateFindProduct(){
+        UUID categoryId=UUID.randomUUID();
+        UUID productId=UUID.randomUUID();
+
+        ProductRequestDTO requestDTO= new ProductRequestDTO(
+                "Teclado",
+                "teclado gamer",
+                new BigDecimal("350"),
+                5,
+                categoryId
+        );
+        when(repository.existsByNameAndCategoryIdAndIdNot(requestDTO.name(),requestDTO.categoryId(),productId)).thenReturn(false);
+        when(repository.findById(productId)).thenReturn(Optional.empty());
+        EntityNotFoundException ex = assertThrows(EntityNotFoundException.class, () -> service.update(productId, requestDTO));
+
+        assertEquals("Product not found",ex.getMessage());
+
+        verify(repository,never()).save(any(Product.class));
+        verify(mapper,never()).toResponse(any(Product.class));
+    }
+
+
+
 
 }
