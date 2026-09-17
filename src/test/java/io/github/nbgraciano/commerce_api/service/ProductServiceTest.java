@@ -248,7 +248,7 @@ public class ProductServiceTest {
     }
 
     @Test
-    @DisplayName("Deve realiar o update")
+    @DisplayName("Deve realizar o update")
     void update(){
         UUID productId = UUID.randomUUID();
         UUID categoryId = UUID.randomUUID();
