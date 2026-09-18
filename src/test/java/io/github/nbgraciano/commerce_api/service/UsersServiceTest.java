@@ -111,4 +111,17 @@ public class UsersServiceTest {
         verify(mapper,never()).toResponse(user);
     }
 
+    @Test
+    @DisplayName("Deve deletar normal pelo Id")
+    void delete(){
+        UUID userId=UUID.randomUUID();
+        Users user=new Users(userId,"Nicholas","nic@gmail.com","12345678", Role.USER);
+
+        when(repository.findById(userId)).thenReturn(Optional.of(user));
+
+        service.delete(userId);
+
+        verify(repository).findById(userId);
+
+    }
 }
