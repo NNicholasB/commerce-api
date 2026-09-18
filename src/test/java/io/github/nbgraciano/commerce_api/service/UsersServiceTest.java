@@ -124,4 +124,20 @@ public class UsersServiceTest {
         verify(repository).findById(userId);
 
     }
+
+    @Test
+    @DisplayName("Deve lancar excecao ao nao encontrar pelo Id")
+    void erroDelete(){
+        UUID userId=UUID.randomUUID();
+        Users user=new Users(userId,"Nicholas","nic@gmail.com","12345678", Role.USER);
+
+        when(repository.findById(userId)).thenReturn(Optional.empty());
+
+        EntityNotFoundException ex = assertThrows(EntityNotFoundException.class, () -> service.delete(userId));
+
+        assertEquals("User not found",ex.getMessage());
+
+        verify(repository,never()).delete(user);
+
+    }
 }
