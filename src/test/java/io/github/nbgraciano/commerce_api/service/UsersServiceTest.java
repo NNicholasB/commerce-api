@@ -5,6 +5,7 @@ import io.github.nbgraciano.commerce_api.entity.Users;
 import io.github.nbgraciano.commerce_api.entity.dto.Users.UsersRequestDTO;
 import io.github.nbgraciano.commerce_api.entity.dto.Users.UsersResponseDTO;
 import io.github.nbgraciano.commerce_api.entity.mappers.UsersMapper;
+import io.github.nbgraciano.commerce_api.exception.DuplicateEntityException;
 import io.github.nbgraciano.commerce_api.exception.EntityNotFoundException;
 import io.github.nbgraciano.commerce_api.repository.UsersRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -91,6 +92,23 @@ public class UsersServiceTest {
 
         verify(mapper).toResponse(user);
 
+    }
+
+    @Test
+    @DisplayName("Deve lancar excecao quando ja existir por nome e email")
+    void erroCreate(){
+        UUID userId=UUID.randomUUID();
+        Users user=new Users(userId,"Nicholas","nic@gmail.com","12345678", Role.USER);
+        UsersRequestDTO requestDTO= new UsersRequestDTO("Nicholas","12345678","nic@gmial.com");
+
+        when(repository.existsByNameAndEmail(requestDTO.name(),requestDTO.email())).thenReturn(true);
+
+        DuplicateEntityException ex = assertThrows(DuplicateEntityException.class, () -> service.create(requestDTO));
+
+        assertEquals("Users already exists",ex.getMessage());
+
+        verify(repository,never()).save(user);
+        verify(mapper,never()).toResponse(user);
     }
 
 }
