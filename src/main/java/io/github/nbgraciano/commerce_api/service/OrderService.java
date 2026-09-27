@@ -6,8 +6,12 @@ import io.github.nbgraciano.commerce_api.entity.dto.Order.OrderRequestDTO;
 import io.github.nbgraciano.commerce_api.entity.dto.Order.OrderResponseDTO;
 import io.github.nbgraciano.commerce_api.entity.dto.OrderItem.OrderItemRequestDTO;
 import io.github.nbgraciano.commerce_api.entity.mappers.OrderMapper;
+import io.github.nbgraciano.commerce_api.entity.records.OrderEvent;
 import io.github.nbgraciano.commerce_api.exception.BusinessException;
 import io.github.nbgraciano.commerce_api.exception.EntityNotFoundException;
+import io.github.nbgraciano.commerce_api.rabbitmq.OrderEventPublisher;
+import io.github.nbgraciano.commerce_api.rabbitmq.RabbitMQConfig;
+import io.github.nbgraciano.commerce_api.rabbitmq.RabbitMQConstants;
 import io.github.nbgraciano.commerce_api.repository.OrderRepository;
 import io.github.nbgraciano.commerce_api.repository.ProductRepository;
 import io.github.nbgraciano.commerce_api.repository.UsersRepository;
@@ -27,6 +31,16 @@ public class OrderService {
     private final UsersRepository userRepository;
     private final ProductRepository productRepository;
     private final OrderMapper mapper;
+    private final OrderEventPublisher eventPublisher;
+
+    private OrderEvent createEvent(Order order) {
+        return new OrderEvent(
+                order.getId(),
+                order.getUser().getId(),
+                order.getTotal(),
+                order.getStatus().name()
+        );
+    }
 
     public OrderResponseDTO create(OrderRequestDTO request){
 
@@ -64,6 +78,8 @@ public class OrderService {
         items.forEach(item->item.setOrder(order));
 
         Order saved=repository.save(order);
+        eventPublisher.publish(RabbitMQConstants.ORDER_CREATED,
+                createEvent(saved));
         return mapper.toResponse(saved);
 
     }
@@ -145,7 +161,11 @@ public class OrderService {
             throw new BusinessException("Order is not waiting for payment");
         }
         order.setStatus(Status.PAID);
-        return mapper.toResponse(repository.save(order));
+        Order saved=repository.save(order);
+
+        eventPublisher.publish(RabbitMQConstants.ORDER_PAID,
+                createEvent(saved));
+        return mapper.toResponse(saved);
     }
 
     public OrderResponseDTO cancel(UUID id){
@@ -158,7 +178,10 @@ public class OrderService {
             );
         }
         order.setStatus(Status.CANCELED);
-        return mapper.toResponse(repository.save(order));
+        Order saved=repository.save(order);
+        eventPublisher.publish(RabbitMQConstants.ORDER_CANCELED,
+                createEvent(saved));
+        return mapper.toResponse(saved);
     }
 
     public OrderResponseDTO ship(UUID id){
@@ -171,7 +194,10 @@ public class OrderService {
             );
         }
         order.setStatus(Status.SHIPPED);
-        return mapper.toResponse(repository.save(order));
+        Order saved=repository.save(order);
+        eventPublisher.publish(RabbitMQConstants.ORDER_SHIPPED,
+                createEvent(saved));
+        return mapper.toResponse(saved);
     }
 
     public OrderResponseDTO deliver(UUID id){
@@ -184,7 +210,10 @@ public class OrderService {
             );
         }
         order.setStatus(Status.DELIVERED);
-        return mapper.toResponse(repository.save(order));
+        Order saved=repository.save(order);
+        eventPublisher.publish(RabbitMQConstants.ORDER_DELIVERED,
+                createEvent(saved));
+        return mapper.toResponse(saved);
     }
 
     public void recalculateTotal(Order order){
