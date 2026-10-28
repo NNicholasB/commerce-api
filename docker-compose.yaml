@@ -1,15 +1,16 @@
-services:
-  postgres:
-    image: postgres:16
-    container_name: commerce-postgres
-    environment:
-      POSTGRES_DB: commerce_db
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
 
-volumes:
-  postgres_data:
+services:
+  commerce-api:
+    build: .
+    container_name: commerce-api
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://host.docker.internal:5432/commerce_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_RABBITMQ_HOST: host.docker.internal
+      SPRING_RABBITMQ_PORT: 5672
+      SPRING_RABBITMQ_USERNAME: guest
+      SPRING_RABBITMQ_PASSWORD: guest
+    restart: unless-stopped
