@@ -23,5 +23,5 @@ spring:
         org.springframework.amqp.rabbit.core.RabbitAdmin: DEBUG
 jwt:
   secret: ${JWT_SECRET}
-  expiration: 3600000
+  expiration: ${JWT_EXPIRATION}
 

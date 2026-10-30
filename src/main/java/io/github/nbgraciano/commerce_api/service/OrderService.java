@@ -7,10 +7,10 @@ import io.github.nbgraciano.commerce_api.entity.dto.Order.OrderResponseDTO;
 import io.github.nbgraciano.commerce_api.entity.dto.OrderItem.OrderItemRequestDTO;
 import io.github.nbgraciano.commerce_api.entity.mappers.OrderMapper;
 import io.github.nbgraciano.commerce_api.entity.records.OrderEvent;
+import io.github.nbgraciano.commerce_api.entity.records.OrderItemEvent;
 import io.github.nbgraciano.commerce_api.exception.BusinessException;
 import io.github.nbgraciano.commerce_api.exception.EntityNotFoundException;
 import io.github.nbgraciano.commerce_api.rabbitmq.OrderEventPublisher;
-import io.github.nbgraciano.commerce_api.rabbitmq.RabbitMQConfig;
 import io.github.nbgraciano.commerce_api.rabbitmq.RabbitMQConstants;
 import io.github.nbgraciano.commerce_api.repository.OrderRepository;
 import io.github.nbgraciano.commerce_api.repository.ProductRepository;
@@ -34,11 +34,21 @@ public class OrderService {
     private final OrderEventPublisher eventPublisher;
 
     private OrderEvent createEvent(Order order) {
+
+        List<OrderItemEvent> items = order.getItems()
+                .stream()
+                .map(item -> new OrderItemEvent(
+                        item.getProduct().getId(),
+                        item.getQuantity()
+                ))
+                .toList();
+
         return new OrderEvent(
                 order.getId(),
                 order.getUser().getId(),
                 order.getTotal(),
-                order.getStatus().name()
+                order.getStatus().name(),
+                items
         );
     }
 

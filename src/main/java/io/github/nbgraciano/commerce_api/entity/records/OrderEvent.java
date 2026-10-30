@@ -7,6 +7,6 @@ public record OrderEvent(
         UUID orderId,
         UUID userId,
         BigDecimal total,
-        String status
-) {
+        String status,
+        java.util.List<OrderItemEvent> items) {
 }
