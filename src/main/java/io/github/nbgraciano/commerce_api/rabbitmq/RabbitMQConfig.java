@@ -24,6 +24,16 @@ public class RabbitMQConfig {
     }
 
     @Bean
+    public  Queue stockProductsQueue(){
+        return new Queue(RabbitMQConstants.STOCK_COMMERCE_PRODUCTS,true);
+    }
+
+    @Bean
+    public  Queue stockProductsCancellationsQueue(){
+        return new Queue(RabbitMQConstants.STOCK_COMMERCE_PRODUCTS_CANCELLATIONS,true);
+    }
+
+    @Bean
     public Queue notificationsQueue(){
         return new Queue(RabbitMQConstants.NOTIFICATIONS_COMMERCE,true);
     }
@@ -37,6 +47,16 @@ public class RabbitMQConfig {
  @Bean
     public Binding stockCanceledBinding(@Qualifier("stockQueue") Queue stockQueue,@Qualifier("commerceExchange") TopicExchange exchange){
         return BindingBuilder.bind(stockQueue).to(exchange).with(RabbitMQConstants.ORDER_CANCELED);
+    }
+
+    @Bean
+    public Binding stockProductBinding(@Qualifier("stockProductsQueue") Queue stockQueue,@Qualifier("commerceExchange") TopicExchange exchange){
+        return BindingBuilder.bind(stockQueue).to(exchange).with(RabbitMQConstants.STOCK_COMMERCE_PRODUCTS);
+    }
+
+    @Bean
+    public Binding stockProductCancellationsBinding(@Qualifier("stockProductsCancellationsQueue") Queue stockQueue,@Qualifier("commerceExchange") TopicExchange exchange){
+        return BindingBuilder.bind(stockQueue).to(exchange).with(RabbitMQConstants.STOCK_COMMERCE_PRODUCTS_CANCELLATIONS);
     }
 
     //payments
