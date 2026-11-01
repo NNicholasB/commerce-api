@@ -5,8 +5,10 @@ import io.github.nbgraciano.commerce_api.entity.Product;
 import io.github.nbgraciano.commerce_api.entity.dto.Product.ProductRequestDTO;
 import io.github.nbgraciano.commerce_api.entity.dto.Product.ProductResponseDTO;
 import io.github.nbgraciano.commerce_api.entity.mappers.ProductMapper;
+import io.github.nbgraciano.commerce_api.entity.records.ProductCreatedEvent;
 import io.github.nbgraciano.commerce_api.exception.DuplicateEntityException;
 import io.github.nbgraciano.commerce_api.exception.EntityNotFoundException;
+import io.github.nbgraciano.commerce_api.rabbitmq.ProductEventPublisher;
 import io.github.nbgraciano.commerce_api.repository.CategoryRepository;
 import io.github.nbgraciano.commerce_api.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +24,7 @@ public class ProductService {
     private final ProductRepository repository;
     private final CategoryRepository categoryRepository;
     private final ProductMapper mapper;
+    private final ProductEventPublisher productEventPublisher;
 
     public ProductResponseDTO create(ProductRequestDTO request){
         if (repository.existsByNameAndCategoryId(request.name(),request.categoryId())){
@@ -33,7 +36,15 @@ public class ProductService {
        Product product=mapper.toEntity(request);
        product.setCategory(category);
 
-        return mapper.toResponse(repository.save(product));
+        Product savedProduct = repository.save(product);
+
+        productEventPublisher.productPublishCreated(
+                new ProductCreatedEvent(
+                        savedProduct.getId(),
+                        savedProduct.getStock()
+                )
+        );
+        return mapper.toResponse(savedProduct);
 
     }
 
@@ -51,6 +62,7 @@ public class ProductService {
             return mapper.toResponse(repository.findByCategory_NameContainingIgnoreCase(category));
         }
         return mapper.toResponse(repository.findAll());
+
     }
 
     public void delete(UUID id){
