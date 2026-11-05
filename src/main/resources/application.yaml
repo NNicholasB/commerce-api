@@ -1,8 +1,10 @@
+
 spring:
   application:
     name: commerce-api
+
   datasource:
-    url: jdbc:postgresql://localhost:5432/commerce_db
+    url: jdbc:postgresql://commerce-postgres:5432/commerce_db
     username: postgres
     password: postgres
 
@@ -13,15 +15,26 @@ spring:
     properties:
       hibernate:
         format_sql: true
+
   rabbitmq:
-    host: localhost
-    port: 5672
-    username: admin
-    password: 123456
-    logging:
-      level:
-        org.springframework.amqp.rabbit.core.RabbitAdmin: DEBUG
+    host: ${SPRING_RABBITMQ_HOST:rabbitmq}
+    port: ${SPRING_RABBITMQ_PORT:5672}
+    username: ${SPRING_RABBITMQ_USERNAME:admin}
+    password: ${SPRING_RABBITMQ_PASSWORD:123456}
+    connection-timeout: 10000 # Espera até 10 segundos pela conexão
+    template:
+      retry:
+        enabled: true
+        initial-interval: 2000
+        max-attempts: 5
+        multiplier: 2.0
+
+logging:
+  level:
+    org.springframework.amqp: DEBUG
+    org.springframework.amqp.rabbit: TRACE
+    org.springframework.boot.autoconfigure.amqp: DEBUG
+
 jwt:
   secret: ${JWT_SECRET}
   expiration: ${JWT_EXPIRATION}
-
