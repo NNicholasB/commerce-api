@@ -1,7 +1,15 @@
 package io.github.nbgraciano.commerce_api.rabbitmq;
 
+
 import org.springframework.amqp.core.*;
+import org.springframework.amqp.rabbit.connection.ConnectionFactory;
+import org.springframework.amqp.rabbit.core.RabbitAdmin;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.amqp.support.converter.JacksonJsonMessageConverter;
+import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -9,33 +17,55 @@ import org.springframework.context.annotation.Configuration;
 public class RabbitMQConfig {
 
     @Bean
+    public RabbitAdmin criarRabbitAdmin(ConnectionFactory connectionFactory){
+        return new RabbitAdmin(connectionFactory);
+    }
+
+    @Bean
+    public ApplicationListener<ApplicationReadyEvent> inicializarAdmin(RabbitAdmin rabbitAdmin){
+        return event-> rabbitAdmin.initialize();
+    }
+
+    @Bean
+    public MessageConverter jacksonJsonMessageConverter(){
+        return new JacksonJsonMessageConverter();
+    }
+
+    @Bean
+    public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory){
+        RabbitTemplate rabbitTemplate= new RabbitTemplate();
+        rabbitTemplate.setConnectionFactory(connectionFactory);
+        rabbitTemplate.setMessageConverter(jacksonJsonMessageConverter());
+        return rabbitTemplate;
+    }
+    @Bean
     public TopicExchange commerceExchange(){
         return new TopicExchange(RabbitMQConstants.EXCHANGE,true,false);
     }
 
     @Bean
     public Queue stockQueue(){
-        return new Queue(RabbitMQConstants.STOCK_COMMERCE,true);
+        return  QueueBuilder.durable(RabbitMQConstants.STOCK_COMMERCE).build();
     }
 
     @Bean
     public Queue paymentsQueue(){
-        return new Queue(RabbitMQConstants.PAYMENTS_COMMERCE,true);
+        return QueueBuilder.durable(RabbitMQConstants.PAYMENTS_COMMERCE).build();
     }
 
     @Bean
     public  Queue stockProductsQueue(){
-        return new Queue(RabbitMQConstants.STOCK_COMMERCE_PRODUCTS,true);
+        return QueueBuilder.durable(RabbitMQConstants.STOCK_COMMERCE_PRODUCTS).build();
     }
 
     @Bean
     public  Queue stockProductsCancellationsQueue(){
-        return new Queue(RabbitMQConstants.STOCK_COMMERCE_PRODUCTS_CANCELLATIONS,true);
+        return QueueBuilder.durable(RabbitMQConstants.STOCK_COMMERCE_PRODUCTS_CANCELLATIONS).build();
     }
 
     @Bean
     public Queue notificationsQueue(){
-        return new Queue(RabbitMQConstants.NOTIFICATIONS_COMMERCE,true);
+        return QueueBuilder.durable(RabbitMQConstants.NOTIFICATIONS_COMMERCE).build();
     }
 
 //stock
@@ -51,7 +81,7 @@ public class RabbitMQConfig {
 
     @Bean
     public Binding stockProductBinding(@Qualifier("stockProductsQueue") Queue stockQueue,@Qualifier("commerceExchange") TopicExchange exchange){
-        return BindingBuilder.bind(stockQueue).to(exchange).with(RabbitMQConstants.STOCK_COMMERCE_PRODUCTS);
+        return BindingBuilder.bind(stockQueue).to(exchange).with(RabbitMQConstants.PRODUCT_CREATED);
     }
 
     @Bean
