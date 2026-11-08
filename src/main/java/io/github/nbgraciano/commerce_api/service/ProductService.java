@@ -40,6 +40,7 @@ public class ProductService {
 
         productEventPublisher.productPublishCreated(
                 new ProductCreatedEvent(
+                        UUID.randomUUID(),
                         savedProduct.getId(),
                         savedProduct.getStock()
                 )
