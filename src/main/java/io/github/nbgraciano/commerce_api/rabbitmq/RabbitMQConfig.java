@@ -43,10 +43,7 @@ public class RabbitMQConfig {
         return new TopicExchange(RabbitMQConstants.EXCHANGE,true,false);
     }
 
-    @Bean
-    public Queue stockQueue(){
-        return  QueueBuilder.durable(RabbitMQConstants.STOCK_COMMERCE).build();
-    }
+
 
     @Bean
     public Queue paymentsQueue(){
@@ -59,8 +56,8 @@ public class RabbitMQConfig {
     }
 
     @Bean
-    public  Queue stockProductsCancellationsQueue(){
-        return QueueBuilder.durable(RabbitMQConstants.STOCK_COMMERCE_PRODUCTS_CANCELLATIONS).build();
+    public  Queue shippedQueue(){
+        return QueueBuilder.durable(RabbitMQConstants.SHIPPED_COMMERCE).build();
     }
 
     @Bean
@@ -71,22 +68,17 @@ public class RabbitMQConfig {
 //stock
 
     @Bean
-    public Binding stockCreatedBinding(@Qualifier("stockQueue") Queue stockQueue, @Qualifier("commerceExchange") TopicExchange exchange){
+    public Binding stockCreatedBinding( Queue stockQueue, @Qualifier("commerceExchange") TopicExchange exchange){
         return BindingBuilder.bind(stockQueue).to(exchange).with(RabbitMQConstants.ORDER_CREATED);
     }
  @Bean
-    public Binding stockCanceledBinding(@Qualifier("stockQueue") Queue stockQueue,@Qualifier("commerceExchange") TopicExchange exchange){
+    public Binding stockCanceledBinding( Queue stockQueue,@Qualifier("commerceExchange") TopicExchange exchange){
         return BindingBuilder.bind(stockQueue).to(exchange).with(RabbitMQConstants.ORDER_CANCELED);
     }
 
     @Bean
     public Binding stockProductBinding(@Qualifier("stockProductsQueue") Queue stockQueue,@Qualifier("commerceExchange") TopicExchange exchange){
         return BindingBuilder.bind(stockQueue).to(exchange).with(RabbitMQConstants.PRODUCT_CREATED);
-    }
-
-    @Bean
-    public Binding stockProductCancellationsBinding(@Qualifier("stockProductsCancellationsQueue") Queue stockQueue,@Qualifier("commerceExchange") TopicExchange exchange){
-        return BindingBuilder.bind(stockQueue).to(exchange).with(RabbitMQConstants.STOCK_COMMERCE_PRODUCTS_CANCELLATIONS);
     }
 
     //payments
@@ -113,6 +105,11 @@ public class RabbitMQConfig {
     @Bean
     public Binding notificationsPaymentApprovedQueue(@Qualifier("notificationsQueue") Queue notificationsQueue,@Qualifier("commerceExchange") TopicExchange exchange){
         return BindingBuilder.bind(notificationsQueue).to(exchange).with(RabbitMQConstants.ORDER_PAID);
+    }
+    //shipping
+    @Bean
+    public Binding shippedBinding(@Qualifier("shippedQueue") Queue shippedQueue,@Qualifier("commerceExchange") TopicExchange exchange){
+        return BindingBuilder.bind(shippedQueue).to(exchange).with(RabbitMQConstants.ORDER_PAID);
     }
 
 
