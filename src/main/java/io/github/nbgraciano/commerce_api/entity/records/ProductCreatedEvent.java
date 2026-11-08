@@ -7,8 +7,10 @@ import java.util.UUID;
 
 public record ProductCreatedEvent(
 
-        @NotNull(message = "ProductId is required")
-        UUID id,
+
+        UUID eventId,
+
+        UUID productId,
 
         @PositiveOrZero(message = "Stock not can be negative")
         Integer stock
