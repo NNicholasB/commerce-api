@@ -13,7 +13,7 @@ public class ProductEventPublisher {
 
 
     public void productPublishCreated(ProductCreatedEvent event){
-            rabbitTemplate.convertAndSend(RabbitMQConstants.EXCHANGE,RabbitMQConstants.STOCK_COMMERCE_PRODUCTS
+            rabbitTemplate.convertAndSend(RabbitMQConstants.EXCHANGE,RabbitMQConstants.PRODUCT_CREATED
             ,event);
     }
 }
