@@ -69,11 +69,11 @@ public class RabbitMQConfig {
 
     @Bean
     public Binding stockCreatedBinding( Queue stockQueue, @Qualifier("commerceExchange") TopicExchange exchange){
-        return BindingBuilder.bind(stockQueue).to(exchange).with(RabbitMQConstants.ORDER_CREATED);
+        return BindingBuilder.bind(stockQueue).to(exchange).with(RabbitMQConstants.STOCK_COMMERCE_RESERVED);
     }
  @Bean
     public Binding stockCanceledBinding( Queue stockQueue,@Qualifier("commerceExchange") TopicExchange exchange){
-        return BindingBuilder.bind(stockQueue).to(exchange).with(RabbitMQConstants.ORDER_CANCELED);
+        return BindingBuilder.bind(stockQueue).to(exchange).with(RabbitMQConstants.STOCK_COMMERCE_REJECTED);
     }
 
     @Bean
