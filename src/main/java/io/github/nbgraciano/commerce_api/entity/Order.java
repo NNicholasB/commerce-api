@@ -28,6 +28,8 @@ public class Order {
 
     private BigDecimal total;
 
+    private String statusStock;
+
     @OneToMany(
             mappedBy = "order",
             cascade = CascadeType.ALL,
