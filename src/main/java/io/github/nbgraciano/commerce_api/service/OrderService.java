@@ -15,6 +15,7 @@ import io.github.nbgraciano.commerce_api.rabbitmq.RabbitMQConstants;
 import io.github.nbgraciano.commerce_api.repository.OrderRepository;
 import io.github.nbgraciano.commerce_api.repository.ProductRepository;
 import io.github.nbgraciano.commerce_api.repository.UsersRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -177,14 +178,14 @@ public class OrderService {
                 createEvent(saved));
         return mapper.toResponse(saved);
     }
-
+    @Transactional
     public OrderResponseDTO cancel(UUID id){
         Order order=repository.findById(id).orElseThrow(()->
                 new EntityNotFoundException("Order not found"));
 
-        if (order.getStatus() != Status.WAITING_PAYMENT) {
+        if (order.getStatus() != Status.WAITING_PAYMENT && order.getStatus() != Status.WAITING_STOCK) {
             throw new BusinessException(
-                    "Only orders waiting for payment can be canceled"
+                    "Order cannot be canceled in its current status"
             );
         }
         order.setStatus(Status.CANCELED);
@@ -193,6 +194,20 @@ public class OrderService {
                 createEvent(saved));
         return mapper.toResponse(saved);
     }
+
+    @Transactional
+    public void rejectOrder(UUID orderId, String statusOrder){
+        Order order = repository.findById(orderId).orElseThrow(()-> new EntityNotFoundException("Order not found"));
+
+        if (order.getStatus() != Status.WAITING_STOCK){
+            return;
+        }
+        order.setStatus(Status.REJECTED);
+        order.setStatusStock(statusOrder);
+
+
+    }
+
 
     public OrderResponseDTO ship(UUID id){
         Order order=repository.findById(id).orElseThrow(()->
@@ -232,6 +247,7 @@ public class OrderService {
     order.setTotal(total);
     repository.save(order);
     }
+
 
     public Order findEntityById(UUID orderId) {
         return repository.findById(orderId).orElseThrow(()->new EntityNotFoundException("Order not found"));
