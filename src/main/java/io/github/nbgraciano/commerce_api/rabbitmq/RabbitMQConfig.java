@@ -55,6 +55,7 @@ public class RabbitMQConfig {
         return QueueBuilder.durable(RabbitMQConstants.STOCK_COMMERCE_PRODUCTS).build();
     }
 
+
     @Bean
     public  Queue shippedQueue(){
         return QueueBuilder.durable(RabbitMQConstants.SHIPPED_COMMERCE).build();
