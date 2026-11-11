@@ -9,6 +9,7 @@ public final class RabbitMQConstants {
     public static final String ORDER_CANCELED = "order.canceled";
     public static final String ORDER_SHIPPED = "order.shipped";
     public static final String ORDER_DELIVERED = "order.delivered";
+    public static final String COMMERCE_ORDER_CANCELED = "commerce.order.canceled";
 
     //products
     public static final String PRODUCT_CREATED = "product.created";
