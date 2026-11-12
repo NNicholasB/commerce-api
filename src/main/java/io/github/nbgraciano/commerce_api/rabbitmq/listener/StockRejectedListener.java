@@ -13,10 +13,10 @@ import org.springframework.stereotype.Component;
 public class StockRejectedListener {
 
     private final OrderService service;
-    private final String queue=" RabbitMQConstants.STOCK_COMMERCE_REJECTED";
+    private final String queue= RabbitMQConstants.STOCK_COMMERCE_REJECTED;
 
     @RabbitListener(queues = queue)
     public void receive(StockResultDTO dto){
-        service.rejectOrder(dto.orderId(),dto.status());
+        service.rejectOrder(dto.orderId(),"REJECTED");
     }
 }
