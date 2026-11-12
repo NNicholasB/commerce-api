@@ -8,7 +8,7 @@ import io.github.nbgraciano.commerce_api.entity.mappers.ProductMapper;
 import io.github.nbgraciano.commerce_api.entity.records.ProductCreatedEvent;
 import io.github.nbgraciano.commerce_api.exception.DuplicateEntityException;
 import io.github.nbgraciano.commerce_api.exception.EntityNotFoundException;
-import io.github.nbgraciano.commerce_api.rabbitmq.ProductEventPublisher;
+import io.github.nbgraciano.commerce_api.rabbitmq.publisher.ProductEventPublisher;
 import io.github.nbgraciano.commerce_api.repository.CategoryRepository;
 import io.github.nbgraciano.commerce_api.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
