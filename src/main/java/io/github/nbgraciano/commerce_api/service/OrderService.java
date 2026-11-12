@@ -10,7 +10,7 @@ import io.github.nbgraciano.commerce_api.entity.records.OrderEvent;
 import io.github.nbgraciano.commerce_api.entity.records.OrderItemEvent;
 import io.github.nbgraciano.commerce_api.exception.BusinessException;
 import io.github.nbgraciano.commerce_api.exception.EntityNotFoundException;
-import io.github.nbgraciano.commerce_api.rabbitmq.OrderEventPublisher;
+import io.github.nbgraciano.commerce_api.rabbitmq.publisher.OrderEventPublisher;
 import io.github.nbgraciano.commerce_api.rabbitmq.RabbitMQConstants;
 import io.github.nbgraciano.commerce_api.repository.OrderRepository;
 import io.github.nbgraciano.commerce_api.repository.ProductRepository;
@@ -195,7 +195,7 @@ public class OrderService {
         return mapper.toResponse(saved);
     }
 
-    @Transactional
+
     public void rejectOrder(UUID orderId, String statusOrder){
         Order order = repository.findById(orderId).orElseThrow(()-> new EntityNotFoundException("Order not found"));
 
@@ -204,8 +204,15 @@ public class OrderService {
         }
         order.setStatus(Status.REJECTED);
         order.setStatusStock(statusOrder);
+    }
 
-
+    public void acceptedOrder(UUID orderId,String statusOrder){
+        Order order= repository.findById(orderId).orElseThrow(()-> new EntityNotFoundException("Order not found"));
+        if (order.getStatus()==Status.WAITING_STOCK){
+            order.setStatus(Status.WAITING_PAYMENT);
+            order.setStatusStock(statusOrder);
+            return;
+        }
     }
 
 
