@@ -82,7 +82,7 @@ public class OrderService {
     }
         Order order=new Order();
         order.setUser(user);
-        order.setStatus(Status.WAITING_PAYMENT);
+        order.setStatus(Status.WAITING_STOCK);
         order.setTotal(total);
         order.setItems(items);
 
@@ -204,15 +204,17 @@ public class OrderService {
         }
         order.setStatus(Status.REJECTED);
         order.setStatusStock(statusOrder);
+        repository.save(order);
     }
 
     public void acceptedOrder(UUID orderId,String statusOrder){
         Order order= repository.findById(orderId).orElseThrow(()-> new EntityNotFoundException("Order not found"));
         if (order.getStatus()==Status.WAITING_STOCK){
-            order.setStatus(Status.WAITING_PAYMENT);
-            order.setStatusStock(statusOrder);
-            return;
+           return;
         }
+        order.setStatus(Status.WAITING_PAYMENT);
+        order.setStatusStock(statusOrder);
+        repository.save(order);
     }
 
 
