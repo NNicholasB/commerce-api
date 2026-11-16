@@ -67,17 +67,9 @@ public class OrderItemServiceTest {
         );
 
         Order order = new Order(
-                orderId,
-                new Users(
-                        UUID.randomUUID(),
-                        "Nic",
-                        "nic@gmail.com",
-                        "1234",
-                        Role.USER
-                ),
-                Status.WAITING_PAYMENT,
-                new BigDecimal("125"),
-                List.of()
+                orderId, new Users(UUID.randomUUID(),"Nic","nic@gmail.com","123213",Role.USER),
+              Status.WAITING_STOCK,
+                new BigDecimal("125.0"),"WAITING",List.of()
         );
 
         OrderItem orderItem = new OrderItem();
@@ -186,7 +178,7 @@ public class OrderItemServiceTest {
         UUID orderItemId= UUID.randomUUID();
         Product product= new Product(productId,"Mouse","mouse para pc",new BigDecimal(125),12,new Category(UUID.randomUUID(),"Eletronicos"));
         Order order=new Order(orderId,new Users(userId,
-                "Nicholas","nic@gmail.com","123",Role.USER), Status.WAITING_PAYMENT,new BigDecimal(125)
+                "Nicholas","nic@gmail.com","123",Role.USER), Status.WAITING_PAYMENT,new BigDecimal(125),null
                 ,new ArrayList<>());
         OrderItemRequestDTO requestDTO= new OrderItemRequestDTO(productId,1);
 
@@ -212,7 +204,7 @@ public class OrderItemServiceTest {
         UUID orderItemId= UUID.randomUUID();
         Product product= new Product(productId,"Mouse","mouse para pc",new BigDecimal(125),12,new Category(UUID.randomUUID(),"Eletronicos"));
         Order order=new Order(orderId,new Users(userId,
-                "Nicholas","nic@gmail.com","123",Role.USER), Status.WAITING_PAYMENT,new BigDecimal(125)
+                "Nicholas","nic@gmail.com","123",Role.USER), Status.WAITING_PAYMENT,new BigDecimal(125),null
                 ,new ArrayList<>());
         OrderItemRequestDTO requestDTO= new OrderItemRequestDTO(productId,1);
 
@@ -234,7 +226,7 @@ public class OrderItemServiceTest {
         UUID orderItemId= UUID.randomUUID();
         Product product= new Product(productId,"Mouse","mouse para pc",new BigDecimal(125),12,new Category(UUID.randomUUID(),"Eletronicos"));
         Order order=new Order(orderId,new Users(userId,
-                "Nicholas","nic@gmail.com","123",Role.USER), Status.WAITING_PAYMENT,new BigDecimal(125)
+                "Nicholas","nic@gmail.com","123",Role.USER), Status.WAITING_PAYMENT,new BigDecimal(125),null
                 ,new ArrayList<>());
         OrderItem orderItem=new OrderItem(orderItemId,order,product,1,new BigDecimal(125),new BigDecimal(125));
 
@@ -270,7 +262,7 @@ public class OrderItemServiceTest {
 
         Product product= new Product(productId,"Mouse","mouse para pc",new BigDecimal(125),12,new Category(UUID.randomUUID(),"Eletronicos"));
         Order order=new Order(orderId,new Users(userId,
-                "Nicholas","nic@gmail.com","123",Role.USER), Status.WAITING_PAYMENT,new BigDecimal(125)
+                "Nicholas","nic@gmail.com","123",Role.USER), Status.WAITING_PAYMENT,new BigDecimal(125),null
                 ,new ArrayList<>());
         OrderItem orderItem=new OrderItem(orderItemId,order,product,1,new BigDecimal(125),new BigDecimal(125));
 
@@ -293,7 +285,7 @@ public class OrderItemServiceTest {
 
         Product product= new Product(productId,"Mouse","mouse para pc",new BigDecimal(125),12,new Category(UUID.randomUUID(),"Eletronicos"));
         Order order=new Order(orderId,new Users(userId,
-                "Nicholas","nic@gmail.com","123",Role.USER), Status.WAITING_PAYMENT,new BigDecimal(125)
+                "Nicholas","nic@gmail.com","123",Role.USER), Status.WAITING_PAYMENT,new BigDecimal(125),null
                 ,new ArrayList<>());
         OrderItem orderItem=new OrderItem(orderItemId,order,product,1,new BigDecimal(125),new BigDecimal(125));
 
@@ -318,7 +310,7 @@ public class OrderItemServiceTest {
 
         Product product= new Product(productId,"Mouse","mouse para pc",new BigDecimal(125),12,new Category(UUID.randomUUID(),"Eletronicos"));
         Order order=new Order(orderId,new Users(userId,
-                "Nicholas","nic@gmail.com","123",Role.USER), Status.WAITING_PAYMENT,new BigDecimal(125)
+                "Nicholas","nic@gmail.com","123",Role.USER), Status.WAITING_PAYMENT,new BigDecimal(125),null
                 ,new ArrayList<>());
         OrderItem orderItem=new OrderItem(orderItemId,
                 order, new Product(productIdd,"Teclado","teclado apra pc",new BigDecimal(55),
