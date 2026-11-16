@@ -54,6 +54,15 @@ public class RabbitMQConfig {
     public  Queue stockProductsQueue(){
         return QueueBuilder.durable(RabbitMQConstants.STOCK_COMMERCE_PRODUCTS).build();
     }
+    @Bean
+    public  Queue stockProductsQueueReserved(){
+        return QueueBuilder.durable(RabbitMQConstants.STOCK_COMMERCE_RESERVED).build();
+    }
+
+    @Bean
+    public  Queue stockProductsQueueRejected(){
+        return QueueBuilder.durable(RabbitMQConstants.STOCK_COMMERCE_REJECTED).build();
+    }
 
 
     @Bean
@@ -69,11 +78,11 @@ public class RabbitMQConfig {
 //stock
 
     @Bean
-    public Binding stockCreatedBinding( Queue stockQueue, @Qualifier("commerceExchange") TopicExchange exchange){
+    public Binding stockCreatedBinding(@Qualifier("stockProductsQueueReserved")  Queue stockQueue, @Qualifier("commerceExchange") TopicExchange exchange){
         return BindingBuilder.bind(stockQueue).to(exchange).with(RabbitMQConstants.STOCK_COMMERCE_RESERVED);
     }
  @Bean
-    public Binding stockCanceledBinding( Queue stockQueue,@Qualifier("commerceExchange") TopicExchange exchange){
+    public Binding stockCanceledBinding(@Qualifier("stockProductsQueueRejected")  Queue stockQueue,@Qualifier("commerceExchange") TopicExchange exchange){
         return BindingBuilder.bind(stockQueue).to(exchange).with(RabbitMQConstants.STOCK_COMMERCE_REJECTED);
     }
 
