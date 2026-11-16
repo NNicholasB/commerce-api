@@ -54,7 +54,7 @@ public class OrderServiceTest {
         UUID userId= UUID.randomUUID();
 
         Users user=new Users(userId,"Nicholas","nic@gmail.com","123", Role.USER);
-        Order order= new Order(orderId,user,Status.PAID,new BigDecimal(15), List.of());
+        Order order= new Order(orderId,user,Status.PAID,new BigDecimal(15),null, List.of());
         order.setStatus(Status.PAID);
 
         OrderResponseDTO responseDTO = new OrderResponseDTO(
@@ -84,7 +84,7 @@ public class OrderServiceTest {
         UUID userId= UUID.randomUUID();
 
         Users user=new Users(userId,"Nicholas","nic@gmail.com","123", Role.USER);
-        Order order= new Order(orderId,user,Status.PAID,new BigDecimal(15), List.of());
+        Order order= new Order(orderId,user,Status.PAID,new BigDecimal(15),null, List.of());
         order.setStatus(Status.PAID);
 
         when(repository.findById(orderId)).thenReturn(Optional.empty());
@@ -122,7 +122,7 @@ public class OrderServiceTest {
         Order order = new Order(orderId,
                 user,
                 Status.WAITING_PAYMENT,
-                new BigDecimal(125),
+                new BigDecimal(125),null,
                 List.of()
         );
 
@@ -181,7 +181,7 @@ public class OrderServiceTest {
         Order order = new Order(orderId,
                 user,
                 Status.WAITING_PAYMENT,
-                new BigDecimal(125),
+                new BigDecimal(125),null,
                 List.of()
         );
 
@@ -213,7 +213,7 @@ public class OrderServiceTest {
         Order order = new Order(orderId,
                 user,
                 Status.WAITING_PAYMENT,
-                new BigDecimal(125),
+                new BigDecimal(125),null,
                 List.of()
         );
         when(repository.findById(orderId)).thenReturn(Optional.empty());
@@ -267,7 +267,7 @@ public class OrderServiceTest {
         Order order = new Order(orderId,
                 user,
                 Status.WAITING_PAYMENT,
-                new BigDecimal(125),
+                new BigDecimal(125),null,
                 List.of()
         );
 
@@ -336,7 +336,7 @@ public class OrderServiceTest {
         Order order = new Order(orderId,
                 user,
                 Status.WAITING_PAYMENT,
-                new BigDecimal(125),
+                new BigDecimal(125),null,
                 List.of()
         );
 
@@ -396,7 +396,7 @@ public class OrderServiceTest {
         Order order = new Order(orderId,
                 user,
                 Status.DELIVERED,
-                new BigDecimal(125),
+                new BigDecimal(125),null,
                 List.of()
         );
 
@@ -430,7 +430,7 @@ public class OrderServiceTest {
         Order order = new Order(orderId,
                 user,
                 Status.WAITING_PAYMENT,
-                new BigDecimal(125),
+                new BigDecimal(125),null,
                 List.of()
         );
 
@@ -493,7 +493,7 @@ public class OrderServiceTest {
         Order order = new Order(orderId,
                 user,
                 Status.DELIVERED,
-                new BigDecimal(125),
+                new BigDecimal(125),null,
                 List.of()
         );
 
@@ -527,7 +527,7 @@ public class OrderServiceTest {
         Order order = new Order(orderId,
                 user,
                 Status.PAID,
-                new BigDecimal(125),
+                new BigDecimal(125),null,
                 List.of()
         );
 
@@ -590,7 +590,7 @@ public class OrderServiceTest {
         Order order = new Order(orderId,
                 user,
                 Status.DELIVERED,
-                new BigDecimal(125),
+                new BigDecimal(125),null,
                 List.of()
         );
 
@@ -624,7 +624,7 @@ public class OrderServiceTest {
         Order order = new Order(orderId,
                 user,
                 Status.SHIPPED,
-                new BigDecimal(125),
+                new BigDecimal(125),null,
                 List.of()
         );
 
@@ -688,7 +688,7 @@ public class OrderServiceTest {
         Order order = new Order(orderId,
                 user,
                 Status.DELIVERED,
-                new BigDecimal(125),
+                new BigDecimal(125),null,
                 List.of()
         );
 
